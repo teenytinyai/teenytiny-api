@@ -1,0 +1,22 @@
+# Cloudflare Worker configuration
+name = "teenytiny-api"
+main = "dist/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (set these in Cloudflare dashboard or with wrangler secret)
+# wrangler secret put API_KEY
+[vars]
+# API_KEY will be set as a secret
+
+# For local development
+[env.development]
+vars = { API_KEY = "tt-dev-key-12345" }
+
+# For staging
+[env.staging]
+# API_KEY should be set as a secret
+
+# For production
+[env.production]
+# API_KEY should be set as a secret
