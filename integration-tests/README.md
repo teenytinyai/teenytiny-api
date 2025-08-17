@@ -42,6 +42,14 @@ Tests LangChain framework integration:
 - Streaming (sync and async)
 - Usage metadata and token counting
 
+### python-litellm/
+Tests LiteLLM framework compatibility:
+- Custom OpenAI-compatible endpoint integration
+- LiteLLM's unified API across providers
+- Streaming and async operations
+- Utility functions (token counting, cost calculation)
+- Callback and logging features
+
 ## Adding New Test Suites
 
 1. Create a new directory (e.g., `curl/`, `node-openai/`, etc.)
