@@ -1,6 +1,6 @@
 import { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { APIError } from '../types/errors.js';
+import { APIError } from '../openai-protocol/errors.js';
 
 export function createErrorHandler() {
   return async (err: Error, c: Context) => {

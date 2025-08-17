@@ -3,34 +3,34 @@ import type {
   ChatCompletionResponse,
   ChatCompletionStreamResponse,
   ChatCompletionMessage,
-} from '../types/openai.js';
+} from './types.js';
 import {
   generateChatCompletionId,
   getCurrentTimestamp,
-} from '../types/openai.js';
-import { ChatModel, estimateTokens } from './base.js';
+} from './types.js';
+import { Model } from '../models/model.js';
 
-export class EchoModel implements ChatModel {
-  readonly id = 'echo';
-  readonly ownedBy = 'teenytiny-ai';
-  readonly created = getCurrentTimestamp();
+export class OpenAIAdapter {
+  constructor(private model: Model, private modelId: string) {}
 
   async complete(request: ChatCompletionRequest): Promise<ChatCompletionResponse> {
-    // Add a small delay to simulate processing
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const lastUserMessage = this.getLastUserMessage(request.messages);
-    const responseContent = lastUserMessage || 
-      "Hello! I'm the Echo model. Send me a message and I'll echo it back.";
-
-    const promptTokens = this.calculatePromptTokens(request.messages);
-    const completionTokens = this.countTokens(responseContent);
+    const input = this.extractTextFromMessages(request.messages);
+    
+    // Collect all chunks from the streaming model
+    const chunks: string[] = [];
+    for await (const chunk of this.model.process(input)) {
+      chunks.push(chunk);
+    }
+    
+    const responseContent = chunks.join('').trim();
+    const promptTokens = this.estimateTokens(input);
+    const completionTokens = this.estimateTokens(responseContent);
 
     return {
       id: generateChatCompletionId(),
       object: 'chat.completion',
       created: getCurrentTimestamp(),
-      model: this.id,
+      model: this.modelId,
       choices: [
         {
           index: 0,
@@ -50,13 +50,7 @@ export class EchoModel implements ChatModel {
   }
 
   async *completeStream(request: ChatCompletionRequest): AsyncIterable<ChatCompletionStreamResponse> {
-    const lastUserMessage = this.getLastUserMessage(request.messages);
-    const responseContent = lastUserMessage || 
-      "Hello! I'm the Echo model. Send me a message and I'll echo it back.";
-
-    const promptTokens = this.calculatePromptTokens(request.messages);
-    const completionTokens = this.countTokens(responseContent);
-
+    const input = this.extractTextFromMessages(request.messages);
     const id = generateChatCompletionId();
     const created = getCurrentTimestamp();
 
@@ -65,7 +59,7 @@ export class EchoModel implements ChatModel {
       id,
       object: 'chat.completion.chunk',
       created,
-      model: this.id,
+      model: this.modelId,
       choices: [
         {
           index: 0,
@@ -74,35 +68,34 @@ export class EchoModel implements ChatModel {
       ],
     };
 
-    // Stream the response word by word
-    const words = responseContent.split(' ');
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      const content = i === 0 ? word : ` ${word}`;
-
+    // Stream content chunks
+    let totalContent = '';
+    for await (const chunk of this.model.process(input)) {
+      totalContent += chunk;
+      
       yield {
         id,
         object: 'chat.completion.chunk',
         created,
-        model: this.id,
+        model: this.modelId,
         choices: [
           {
             index: 0,
-            delta: { content: content },
+            delta: { content: chunk },
           },
         ],
       };
-
-      // Small delay between words to simulate streaming
-      await new Promise(resolve => setTimeout(resolve, 50));
     }
 
     // Send final chunk with finish reason and usage
+    const promptTokens = this.estimateTokens(input);
+    const completionTokens = this.estimateTokens(totalContent.trim());
+
     yield {
       id,
       object: 'chat.completion.chunk',
       created,
-      model: this.id,
+      model: this.modelId,
       choices: [
         {
           index: 0,
@@ -118,11 +111,8 @@ export class EchoModel implements ChatModel {
     };
   }
 
-  countTokens(text: string): number {
-    return estimateTokens(text);
-  }
-
-  private getLastUserMessage(messages: ChatCompletionMessage[]): string {
+  private extractTextFromMessages(messages: ChatCompletionMessage[]): string {
+    // Find the last user message
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i]?.role === 'user') {
         return messages[i]!.content;
@@ -131,12 +121,8 @@ export class EchoModel implements ChatModel {
     return '';
   }
 
-  private calculatePromptTokens(messages: ChatCompletionMessage[]): number {
-    let total = 0;
-    for (const message of messages) {
-      // Add some overhead for message formatting
-      total += this.countTokens(`${message.role}: ${message.content}`) + 4;
-    }
-    return total;
+  private estimateTokens(text: string): number {
+    // Simple estimation: roughly 1 token per 4 characters
+    return Math.ceil(text.trim().length / 4);
   }
 }

@@ -1,5 +1,5 @@
 import { Context, Next } from 'hono';
-import { AuthenticationError } from '../types/errors.js';
+import { AuthenticationError } from '../openai-protocol/errors.js';
 
 export interface AuthConfig {
   apiKey: string;

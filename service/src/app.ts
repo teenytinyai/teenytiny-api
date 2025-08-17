@@ -7,11 +7,12 @@ type Variables = {
 import { stream } from 'hono/streaming';
 import type {
   ChatCompletionRequest,
-  ModelsResponse,
-} from './types/openai.js';
-import { InvalidRequestError, NotFoundError } from './types/errors.js';
-import { ModelRegistry } from './models/base.js';
-import { EchoModel } from './models/echo.js';
+} from './openai-protocol/types.js';
+import { InvalidRequestError, NotFoundError } from './openai-protocol/errors.js';
+import { ModelRegistry } from './models/model-registry.js';
+import { OpenAIModelRegistry } from './openai-protocol/openai-model-registry.js';
+import { EchoModel } from './models/echo-model.js';
+import { DelayModelware } from './modelware/delay-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
 import { corsMiddleware } from './middleware/cors.js';
 import { createLoggingMiddleware } from './middleware/logging.js';
@@ -24,9 +25,15 @@ export interface AppConfig {
 export function createApp(config: AppConfig) {
   const app = new Hono<{ Variables: Variables }>();
 
-  // Initialize model registry
-  const registry = new ModelRegistry();
-  registry.register(new EchoModel());
+  // Initialize model registries
+  const coreRegistry = new ModelRegistry();
+  const openaiRegistry = new OpenAIModelRegistry(coreRegistry);
+  
+  // Create models with composition
+  const echoModel = new EchoModel();
+  const delayedEchoModel = new DelayModelware(echoModel, 50);
+  
+  openaiRegistry.register('echo', delayedEchoModel);
 
   // Middleware
   app.use('*', corsMiddleware());
@@ -47,17 +54,13 @@ export function createApp(config: AppConfig) {
 
   // Models endpoint
   app.get('/v1/models', (c) => {
-    const models = registry.list();
-    const response: ModelsResponse = {
-      object: 'list',
-      data: models,
-    };
+    const response = openaiRegistry.listAsResponse();
 
     console.log(JSON.stringify({
       level: 'info',
       message: 'Models listed',
       request_id: c.get('requestId'),
-      model_count: models.length,
+      model_count: response.data.length,
     }));
 
     return c.json(response);
@@ -109,9 +112,9 @@ export function createApp(config: AppConfig) {
       }
     }
 
-    // Get model
-    const model = registry.get(request.model);
-    if (!model) {
+    // Get model adapter
+    const adapter = openaiRegistry.get(request.model);
+    if (!adapter) {
       throw new InvalidRequestError(`Model not found: ${request.model}`, 'model');
     }
 
@@ -136,7 +139,7 @@ export function createApp(config: AppConfig) {
         let totalTokens = 0;
 
         try {
-          for await (const chunk of model.completeStream(request)) {
+          for await (const chunk of adapter.completeStream(request)) {
             // Track token usage from final chunk
             if (chunk.usage) {
               totalTokens = chunk.usage.total_tokens;
@@ -172,7 +175,7 @@ export function createApp(config: AppConfig) {
       });
     } else {
       // Non-streaming response
-      const response = await model.complete(request);
+      const response = await adapter.complete(request);
 
       console.log(JSON.stringify({
         level: 'info',
