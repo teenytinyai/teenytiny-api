@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { EchoModel } from '../src/models/echo-model.js';
 import { ElizaModel } from '../src/models/eliza-model.js';
+import { ParryModel } from '../src/models/parry-model.js';
 import { DelayModelware } from '../src/modelware/delay-modelware.js';
 import { StreamSplitModelware } from '../src/modelware/stream-split-modelware.js';
 
@@ -131,7 +132,7 @@ describe('Simple Model Interface', () => {
       }
       
       expect(chunks).toHaveLength(1);
-      expect(chunks[0]).toMatch(/you are|How long have you been|Why do you say/);
+      expect(chunks[0]).toMatch(/you are|How long have you been|Why do you say|What does being.*mean to you/);
     });
 
     it('should handle I feel with context extraction', async () => {
@@ -230,6 +231,127 @@ describe('Simple Model Interface', () => {
       
       expect(chunks).toHaveLength(1);
       expect(chunks[0]).toMatch(/Hello|Hi|feeling/);
+    });
+  });
+
+  describe('ParryModel', () => {
+    it('should respond defensively to personal questions', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Who are you?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/don't like talking|Why do you need|not important|prefer to keep/);
+    });
+
+    it('should show paranoid responses to work questions', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('What do you do for work?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/rather not discuss|too many questions|Why are you so interested|none of your business/);
+    });
+
+    it('should express paranoid beliefs about surveillance', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Is someone following you?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/following me|same car|being watched|suspicious/);
+    });
+
+    it('should reference core delusions about bookies', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Do you owe money to anyone?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/don't owe anybody|bookies|wasn't my fault|race was fixed/);
+    });
+
+    it('should be suspicious of questions', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Why do you think that?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/Why are you asking|exactly what they would|trying to get information|don't like people who ask|not with them|What exactly are you getting at/);
+    });
+
+    it('should respond cautiously to greetings', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Hello there')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/Do I know you|ask me questions too|What do you want|not with them/);
+    });
+
+    it('should be hostile to authority figures', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Are you talking to the police?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toMatch(/don't talk to police|working with them|won't help me|watching this conversation/);
+    });
+
+    it('should handle empty input suspiciously', async () => {
+      const model = new ParryModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toBe('What do you want?');
+    });
+
+    it('should occasionally mention delusion themes', async () => {
+      const model = new ParryModel();
+      let mentionedThemes = 0;
+      
+      // Test multiple times since themes are added randomly (30% chance)
+      for (let i = 0; i < 10; i++) {
+        const chunks: string[] = [];
+        for await (const chunk of model.process('How are you feeling?')) {
+          chunks.push(chunk);
+        }
+        
+        if (chunks[0]?.includes('bookies') || 
+            chunks[0]?.includes('mail') || 
+            chunks[0]?.includes('car parked') ||
+            chunks[0]?.includes('phone calls')) {
+          mentionedThemes++;
+        }
+      }
+      
+      // Should mention themes at least once in 10 attempts
+      expect(mentionedThemes).toBeGreaterThan(0);
     });
   });
 });

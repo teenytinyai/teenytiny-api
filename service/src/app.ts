@@ -13,6 +13,7 @@ import { ModelRegistry } from './models/model-registry.js';
 import { OpenAIModelRegistry } from './openai-protocol/openai-model-registry.js';
 import { EchoModel } from './models/echo-model.js';
 import { ElizaModel } from './models/eliza-model.js';
+import { ParryModel } from './models/parry-model.js';
 import { DelayModelware } from './modelware/delay-modelware.js';
 import { StreamSplitModelware } from './modelware/stream-split-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
@@ -40,8 +41,13 @@ export function createApp(config: AppConfig) {
   const streamSplitEliza = new StreamSplitModelware(elizaModel, StreamSplitModelware.WORDS);
   const delayedElizaModel = new DelayModelware(streamSplitEliza, 100);
   
+  const parryModel = new ParryModel();
+  const streamSplitParry = new StreamSplitModelware(parryModel, StreamSplitModelware.WORDS);
+  const delayedParryModel = new DelayModelware(streamSplitParry, 120);
+  
   openaiRegistry.register('echo', delayedEchoModel);
   openaiRegistry.register('eliza', delayedElizaModel);
+  openaiRegistry.register('parry', delayedParryModel);
 
   // Middleware
   app.use('*', corsMiddleware());
