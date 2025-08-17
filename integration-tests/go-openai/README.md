@@ -11,13 +11,15 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/sashabaranov/go-openai"
 )
 
 func main() {
 	// Configure Go OpenAI client for TeenyTiny AI
-	config := openai.DefaultConfig("your-api-key")
+	apiKey := os.Getenv("TEENYTINY_API_KEY")
+	config := openai.DefaultConfig(apiKey)
 	config.BaseURL = "https://teenytiny.ai/v1"
 	client := openai.NewClientWithConfig(config)
 

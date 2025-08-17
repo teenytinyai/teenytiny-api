@@ -12,7 +12,7 @@ import { generateText, streamText } from 'ai';
 const provider = createOpenAICompatible({
   name: 'teenytiny',
   baseURL: 'https://teenytiny.ai/v1',
-  apiKey: 'testkey'
+  apiKey: process.env.TEENYTINY_API_KEY
 });
 
 const model = provider('echo');

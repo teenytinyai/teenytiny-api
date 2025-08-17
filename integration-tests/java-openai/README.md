@@ -9,8 +9,9 @@ import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.*;
 
+String apiKey = System.getenv("TEENYTINY_API_KEY");
 OpenAIClient client = OpenAIOkHttpClient.builder()
-    .apiKey("your-api-key")
+    .apiKey(apiKey)
     .baseUrl("https://teenytiny.ai/v1")
     .build();
 

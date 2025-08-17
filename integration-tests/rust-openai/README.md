@@ -14,8 +14,9 @@ use async_openai::{
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Configure Rust OpenAI client for TeenyTiny AI
+    let api_key = std::env::var("TEENYTINY_API_KEY")?;
     let config = OpenAIConfig::new()
-        .with_api_key("your-api-key")
+        .with_api_key(api_key)
         .with_api_base("https://teenytiny.ai/v1");
 
     let client = Client::with_config(config);

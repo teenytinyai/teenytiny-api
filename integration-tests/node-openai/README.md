@@ -8,7 +8,7 @@ Here's how to use the OpenAI SDK with TeenyTiny AI in your own code:
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: 'your-api-key',
+  apiKey: process.env.TEENYTINY_API_KEY,
   baseURL: 'https://teenytiny.ai/v1'
 });
 

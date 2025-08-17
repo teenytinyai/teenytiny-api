@@ -21,12 +21,13 @@ export TEENYTINY_API_KEY=your-api-key
 Here's how to use the OpenAI Python SDK with TeenyTiny AI in your own code:
 
 ```python
+import os
 from openai import OpenAI
 
 # Configure client for TeenyTiny AI service
 client = OpenAI(
-    base_url="http://localhost:8080/v1",  # Your TeenyTiny AI service URL
-    api_key="testkey"                     # Your API key (default: "testkey")
+    base_url="https://teenytiny.ai/v1",   # Your TeenyTiny AI service URL
+    api_key=os.getenv("TEENYTINY_API_KEY") # Your API key from environment variable
 )
 
 # Basic completion

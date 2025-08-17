@@ -9,7 +9,7 @@ require 'openai'
 
 # Configure Ruby OpenAI client for TeenyTiny AI
 client = OpenAI::Client.new(
-  access_token: 'your-api-key',
+  access_token: ENV['TEENYTINY_API_KEY'],
   uri_base: 'https://teenytiny.ai'
 )
 

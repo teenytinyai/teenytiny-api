@@ -8,9 +8,10 @@ Here's how to use LangChain4j with TeenyTiny AI in your own code:
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 
+String apiKey = System.getenv("TEENYTINY_API_KEY");
 ChatLanguageModel model = OpenAiChatModel.builder()
     .baseUrl("https://teenytiny.ai/v1")
-    .apiKey("your-api-key")
+    .apiKey(apiKey)
     .modelName("echo")
     .temperature(0.7)
     .build();

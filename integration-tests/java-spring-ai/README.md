@@ -12,7 +12,8 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
-OpenAiApi openAiApi = new OpenAiApi("https://teenytiny.ai", "your-api-key");
+String apiKey = System.getenv("TEENYTINY_API_KEY");
+OpenAiApi openAiApi = new OpenAiApi("https://teenytiny.ai", apiKey);
 
 OpenAiChatOptions options = OpenAiChatOptions.builder()
     .withModel("echo")
@@ -32,7 +33,7 @@ System.out.println(response.getResult().getOutput().getContent());
 You can also configure Spring AI using application properties:
 
 ```properties
-spring.ai.openai.api-key=your-api-key
+spring.ai.openai.api-key=${TEENYTINY_API_KEY}
 spring.ai.openai.base-url=https://teenytiny.ai
 spring.ai.openai.chat.options.model=echo
 spring.ai.openai.chat.options.temperature=0.7

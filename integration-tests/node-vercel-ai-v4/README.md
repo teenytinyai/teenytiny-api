@@ -11,7 +11,7 @@ import { generateText, streamText } from 'ai';
 // Configure provider for TeenyTiny AI service
 const provider = createOpenAI({
   baseURL: 'https://teenytiny.ai/v1',
-  apiKey: 'testkey'
+  apiKey: process.env.TEENYTINY_API_KEY
 });
 
 const model = provider('echo');
