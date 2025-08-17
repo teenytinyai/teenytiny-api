@@ -34,6 +34,14 @@ Tests the official OpenAI Python SDK compatibility:
 - Authentication and error handling
 - Message validation
 
+### python-langchain/
+Tests LangChain framework integration:
+- ChatOpenAI integration with custom base_url
+- LangChain message abstractions (HumanMessage, SystemMessage, etc.)
+- Chain composition with LCEL operators
+- Streaming (sync and async)
+- Usage metadata and token counting
+
 ## Adding New Test Suites
 
 1. Create a new directory (e.g., `curl/`, `node-openai/`, etc.)
