@@ -14,5 +14,11 @@ echo "Running Java OpenAI SDK integration tests..."
 echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
 echo
 
+# Generate gradle wrapper if it doesn't exist
+if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+    echo "Generating Gradle wrapper..."
+    gradle wrapper >/dev/null 2>&1
+fi
+
 # Run Gradle tests
 ./gradlew test --no-daemon --rerun-tasks "$@"
