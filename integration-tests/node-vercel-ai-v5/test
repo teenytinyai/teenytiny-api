@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Running Vercel AI SDK v5 incompatibility tests..."
+echo "Expected: All tests should demonstrate incompatibility with 404 errors"
+echo ""
+
+# Change to the script's directory
+cd "$(dirname "$0")"
+
+npm test

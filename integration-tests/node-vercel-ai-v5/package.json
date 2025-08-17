@@ -1,0 +1,21 @@
+{
+  "name": "teenytiny-integration-test-vercel-ai-v5",
+  "version": "1.0.0",
+  "description": "Integration tests for TeenyTiny AI with Vercel AI SDK v5",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^2.0.15",
+    "@ai-sdk/openai-compatible": "^1.0.7",
+    "ai": "^5.0.15"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -10,7 +10,8 @@ Integration testing suite for TeenyTiny AI service compatibility with various cl
 | **[python-langchain](python-langchain/)** | Python | [langchain](https://python.langchain.com/docs/introduction/) |
 | **[python-llm](python-llm/)** | Python | [llm](https://llm.datasette.io/en/stable/python-api.html) |
 | **[node-openai](node-openai/)** | JavaScript (Node.js) | [openai](https://github.com/openai/openai-node) |
-| **[node-vercel-ai-v4](node-vercel-ai-v4/)** | JavaScript (Node.js) | [ai](https://v4.ai-sdk.dev/) (v4) |
+| **[node-vercel-ai-v4](node-vercel-ai-v4/)** | JavaScript (Node.js) | [ai](https://ai-sdk.dev/) (v4) |
+| **[node-vercel-ai-v5](node-vercel-ai-v5/)** | JavaScript (Node.js) | [ai](https://v5.ai-sdk.dev/) (v5) |
 
 ## Quick Start
 
