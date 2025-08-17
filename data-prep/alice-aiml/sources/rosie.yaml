@@ -1,6 +1,82 @@
 description: "Rosie chatbot AIML patterns"
 license: "GPL"
 url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/rosie"
+
+# Bot properties required by this collection (extracted from AIML analysis)
+# Moderate usage - 60+ properties with extensive personal details
+bot_properties:
+  # Core identity (high usage)
+  botmaster: null                  # 48 uses - creator reference
+  genus: null                      # 31 uses - bot classification
+  name: null                       # 26 uses - bot's primary name
+  species: null                    # 22 uses - what kind of entity
+  master: null                     # 19 uses - alternative to botmaster
+  location: null                   # 11 uses - where bot is located
+  
+  # Personal characteristics
+  president: null                  # 5 uses - current president
+  gender: null                     # 5 uses - gender identity
+  birthplace: null                 # 5 uses - where created/born
+  order: null                      # 4 uses - taxonomic order
+  favoritecolor: null              # 4 uses - favorite color
+  birthdate: null                  # 4 uses - birth/creation date
+  birthday: null                   # 3 uses - creation date
+  size: null                       # 2 uses - physical size
+  sign: null                       # 2 uses - zodiac sign
+  religion: null                   # 2 uses - religious beliefs
+  friends: null                    # 2 uses - friend references
+  favoritemovie: null              # 2 uses - favorite movie
+  
+  # Extended personal profile (single uses each)
+  weight: null                     # 1 use - physical weight
+  type: null                       # 1 use - entity type
+  skills: null                     # 1 use - abilities
+  siblings: null                   # 1 use - family relationships
+  purpose: null                    # 1 use - reason for existence
+  plans: null                      # 1 use - future plans
+  picture: null                    # 1 use - visual appearance
+  "phone-number": null            # 1 use - contact info
+  pets: null                       # 1 use - pet ownership
+  personality: null                # 1 use - character traits
+  party: null                      # 1 use - political affiliation
+  orientation: null                # 1 use - sexual orientation
+  nationality: null                # 1 use - nationality
+  mother: null                     # 1 use - parental reference
+  middlename: null                 # 1 use - full name component
+  "marital-status": null          # 1 use - relationship status
+  manufacturer: null               # 1 use - who created
+  "look-like": null               # 1 use - physical appearance
+  logo: null                       # 1 use - visual identity
+  lastname: null                   # 1 use - surname
+  language: null                   # 1 use - primary language
+  job: null                        # 1 use - occupation
+  iq: null                         # 1 use - intelligence quotient
+  hobby: null                      # 1 use - leisure activities
+  hero: null                       # 1 use - admired person
+  height: null                     # 1 use - physical height
+  hair: null                       # 1 use - hair description
+  goal: null                       # 1 use - life objectives
+  future: null                     # 1 use - future plans
+  fullname: null                   # 1 use - complete name
+  firstname: null                  # 1 use - given name
+  fear: null                       # 1 use - what scares
+  father: null                     # 1 use - paternal reference
+  family: null                     # 1 use - family info
+  facebook: null                   # 1 use - social media
+  eyes: null                       # 1 use - eye description
+  "eye-color": null               # 1 use - eye color
+  etype: null                      # 1 use - emotion type
+  ethnicity: null                  # 1 use - ethnic background
+  emotions: null                   # 1 use - emotional capabilities
+  education: null                  # 1 use - learning background
+  dog: null                        # 1 use - pet preference
+  diet: null                       # 1 use - eating habits
+  clothing: null                   # 1 use - dress style
+  children: null                   # 1 use - offspring
+  body: null                       # 1 use - physical form
+  "best-friend": null             # 1 use - closest relationship
+  awards: null                     # 1 use - recognition received
+  address: null                    # 1 use - physical address
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/animal.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/bot_profile.aiml"

@@ -1,6 +1,13 @@
 description: "Modern interactive AIML by Steve Worswick"
 license: "GPL-2.0"
 url: "https://github.com/pandorabots/Free-AIML"
+
+# Bot properties required by this collection (extracted from AIML analysis)
+# Very minimal usage - only 3 properties total
+bot_properties:
+  name: null                       # 11 uses - bot's primary name
+  master: null                     # 2 uses - creator reference  
+  birthday: null                   # 2 uses - creation date
 files:
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/20q.aiml"
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/battledome.aiml"

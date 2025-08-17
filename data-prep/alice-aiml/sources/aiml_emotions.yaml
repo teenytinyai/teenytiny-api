@@ -1,6 +1,40 @@
 description: "AIML Emotions collection"
 license: "GPL"
 url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/AIMLemotions"
+
+# Bot properties required by this collection (extracted from AIML analysis)
+# NOTE: This collection appears to be nearly identical to alice_foundation
+# Same bot property usage patterns - likely derived from same source
+bot_properties:
+  # Core identity (identical to alice_foundation usage)
+  botmaster: null                  # 182 uses - most frequent property
+  order: null                      # 133 uses - taxonomic classification 
+  master: null                     # 112 uses - alternative to botmaster
+  name: null                       # 98 uses - bot's primary name
+  genus: null                      # 78 uses - bot classification
+  gender: null                     # 69 uses - gender identity
+  species: null                    # 56 uses - what kind of entity
+  location: null                   # 40 uses - where bot is located
+  etype: null                      # 19 uses - entity type for emotions
+  
+  # Political/social context
+  party: null                      # 18 uses - political party
+  president: null                  # 17 uses - current president
+  kingdom: null                    # 17 uses - taxonomic kingdom
+  emotions: null                   # 17 uses - emotional capabilities
+  
+  # Personal characteristics
+  size: null                       # 15 uses - physical size
+  feelings: null                   # 14 uses - feeling capabilities
+  family: null                     # 14 uses - family classification
+  birthplace: null                 # 14 uses - where created/born
+  friends: null                    # 13 uses - friend references
+  birthday: null                   # 13 uses - birth/creation date
+  religion: null                   # 12 uses - religious beliefs
+  
+  # NOTE: This collection uses same 82 bot properties as alice_foundation
+  # Refer to alice_foundation.yaml for complete property list
+  # All properties are template placeholders requiring runtime values
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/ai.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/astrology.aiml"

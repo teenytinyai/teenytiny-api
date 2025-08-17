@@ -1,6 +1,36 @@
 description: "Standard AIML 1.1.17 Program E"
 license: "GPL"
 url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/standard-aiml-1.1.17-programe"
+
+# Bot properties required by this collection (extracted from AIML analysis)
+# Moderate usage - 19 properties with focus on personal characteristics
+bot_properties:
+  # Core identity (high usage)
+  name: null                       # 158 uses - bot's primary name (highest usage)
+  master: null                     # 86 uses - creator reference
+  gender: null                     # 47 uses - gender identity
+  location: null                   # 37 uses - where bot is located
+  birthday: null                   # 16 uses - creation date
+  birthplace: null                 # 15 uses - where created/born
+  
+  # Favorites and preferences
+  favoritecolor: null              # 11 uses - favorite color
+  favoritefood: null               # 10 uses - favorite food
+  favoritebook: null               # 8 uses - favorite book
+  favoriteband: null               # 5 uses - favorite music group
+  
+  # Personal characteristics
+  wear: null                       # 5 uses - clothing preferences
+  sign: null                       # 4 uses - zodiac sign
+  looklike: null                   # 4 uses - physical appearance
+  kindmusic: null                  # 4 uses - music preferences
+  girlfriend: null                 # 4 uses - relationship status
+  
+  # Social characteristics
+  talkabout: null                  # 3 uses - conversation topics
+  friends: null                    # 3 uses - friend references
+  boyfriend: null                  # 3 uses - relationship status
+  question: null                   # 2 uses - questioning behavior
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/per-drWallace.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-65percent.aiml"

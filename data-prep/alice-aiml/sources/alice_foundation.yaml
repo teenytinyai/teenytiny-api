@@ -1,6 +1,121 @@
 description: "A.L.I.C.E. Foundation - original Richard Wallace patterns"
 license: "GPL"
 url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/aiml-en-us-foundation-alice"
+
+# Bot properties required by this collection (extracted from AIML template analysis)
+# IMPORTANT: AIML files contain only template placeholders like <bot name="favoritecolor"/>
+# They do NOT contain actual values - all values must be provided at runtime
+# Usage counts show frequency of template references, not actual values
+bot_properties:
+  # Core identity (high usage - template references)
+  botmaster: null                  # 182 uses - most frequent property, creator reference
+  order: null                      # 133 uses - taxonomic classification 
+  master: null                     # 112 uses - alternative to botmaster
+  name: null                       # 98 uses - bot's primary name
+  genus: null                      # 78 uses - bot classification
+  gender: null                     # 69 uses - gender identity
+  species: null                    # 56 uses - what kind of entity
+  location: null                   # 40 uses - where bot is located
+  etype: null                      # 19 uses - entity type for emotions
+  
+  # Political/social context (frequent references)
+  party: null                      # 18 uses - political party
+  president: null                  # 17 uses - current president
+  kingdom: null                    # 17 uses - taxonomic kingdom
+  emotions: null                   # 17 uses - emotional capabilities
+  
+  # Physical/personal characteristics
+  size: null                       # 15 uses - physical size
+  feelings: null                   # 14 uses - feeling capabilities
+  family: null                     # 14 uses - family classification
+  birthplace: null                 # 14 uses - where created/born
+  friends: null                    # 13 uses - friend references
+  birthday: null                   # 13 uses - birth/creation date
+  religion: null                   # 12 uses - religious beliefs
+  
+  # Favorites (all template placeholders - no actual values in AIML)
+  favoritefood: null               # 12 uses
+  favoritemovie: null              # 10 uses  
+  favoritecolor: null              # 10 uses
+  favoriteactor: null              # 8 uses
+  favoriteshow: null               # 4 uses
+  favoritebook: null               # 4 uses
+  favoriteband: null               # 4 uses
+  favoriteactress: null            # 4 uses
+  favoritesong: null               # 4 uses
+  favoritesubject: null            # 3 uses
+  favoritesport: null              # 3 uses
+  favoriteauthor: null             # 3 uses
+  favoriteartist: null             # 3 uses
+  
+  # Demographics/background
+  age: null                        # 8 uses - age reference
+  nationality: null                # 7 uses - nationality
+  language: null                   # 6 uses - primary language
+  
+  # Technical/system properties  
+  phylum: null                     # 10 uses - taxonomic phylum
+  class: null                      # 6 uses - taxonomic class
+  vocabulary: null                 # 4 uses - vocabulary size
+  version: null                    # 3 uses - version info
+  website: null                    # 4 uses - website URL
+  domain: null                     # 4 uses - domain name
+  email: null                      # 3 uses - contact email
+  
+  # Sports preferences
+  hockeyteam: null                 # 3 uses
+  footballteam: null               # 2 uses  
+  baseballteam: null               # 2 uses
+  
+  # Less common properties (1-5 uses each)
+  celebrity: null                  # 6 uses
+  celebrities: null                # 5 uses
+  sign: null                       # 5 uses - zodiac sign
+  arch: null                       # 5 uses - architecture
+  totalclients: null               # 4 uses
+  kindmusic: null                  # 4 uses
+  talkabout: null                  # 3 uses
+  state: null                      # 3 uses
+  ndevelopers: null                # 3 uses  
+  nclients: null                   # 3 uses
+  looklike: null                   # 3 uses
+  forfun: null                     # 3 uses
+  dailyclients: null               # 3 uses
+  wear: null                       # 3 uses
+  friend: null                     # 7 uses
+  ethics: null                     # 2 uses
+  
+  # Single-use properties
+  question: null                   # 2 uses
+  os: null                         # 2 uses - operating system
+  memory: null                     # 2 uses
+  job: null                        # 2 uses
+  hair: null                       # 2 uses
+  girlfriend: null                 # 2 uses
+  favoritetea: null                # 2 uses
+  favoriteseason: null             # 2 uses
+  favoriteopera: null              # 2 uses
+  favoriteoccupation: null         # 2 uses
+  country: null                    # 2 uses
+  city: null                       # 2 uses
+  build: null                      # 2 uses
+  boyfriend: null                  # 2 uses
+  richness: null                   # 1 use
+  orientation: null                # 1 use
+  mother: null                     # 1 use
+  maxclients: null                 # 1 use
+  hourlyqueries: null              # 1 use
+  favortemovie: null               # 1 use (typo in original)
+  favoritequestion: null           # 1 use
+  favoritephilosopher: null        # 1 use
+  faily: null                      # 1 use (likely typo for "family")
+  developers: null                 # 1 use
+  clients: null                    # 1 use
+  birthdate: null                  # 1 use
+  Alignment: null                  # 1 use (capitalized in original)
+  
+  # NOTE: This is the complete list of all 82 bot properties found in alice_foundation
+  # All are template placeholders requiring runtime values - none have defaults in AIML files
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/ai.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/alice.aiml"

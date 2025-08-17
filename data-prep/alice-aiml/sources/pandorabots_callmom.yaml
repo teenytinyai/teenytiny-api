@@ -1,6 +1,11 @@
 description: "Pandorabots CallMom AIML"
 license: "LGPL"
 url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/aiml-en-us-pandorabots-callmom"
+
+# Bot properties required by this collection (minimal requirements)
+# Only uses 1 property: name(5)
+bot_properties:
+  name: "CallMom Assistant"  # 5 uses - this collection is designed for mobile assistant
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-pandorabots-callmom/callmom_badanswer.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-pandorabots-callmom/callmom_calendar.aiml"
