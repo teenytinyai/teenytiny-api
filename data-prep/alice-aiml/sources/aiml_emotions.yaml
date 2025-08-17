@@ -32,8 +32,81 @@ bot_properties:
   birthday: null                   # 13 uses - birth/creation date
   religion: null                   # 12 uses - religious beliefs
   
-  # NOTE: This collection uses same 82 bot properties as alice_foundation
-  # Refer to alice_foundation.yaml for complete property list
+  # Additional properties (continuing alice_foundation compatibility)  
+  emotion: null                    # 1 use - singular form of emotions
+  feeling: null                    # 1 use - singular form of feelings
+  
+  # All other properties from alice_foundation (82 total properties)
+  age: null                        # 8 uses - age reference
+  nationality: null                # 7 uses - nationality
+  language: null                   # 6 uses - primary language
+  phylum: null                     # 10 uses - taxonomic phylum
+  class: null                      # 6 uses - taxonomic class
+  vocabulary: null                 # 4 uses - vocabulary size
+  version: null                    # 3 uses - version info
+  website: null                    # 4 uses - website URL
+  domain: null                     # 4 uses - domain name
+  email: null                      # 3 uses - contact email
+  hockeyteam: null                 # 3 uses
+  footballteam: null               # 2 uses  
+  baseballteam: null               # 2 uses
+  celebrity: null                  # 6 uses
+  celebrities: null                # 5 uses
+  sign: null                       # 5 uses - zodiac sign
+  arch: null                       # 5 uses - architecture
+  totalclients: null               # 4 uses
+  kindmusic: null                  # 4 uses
+  talkabout: null                  # 3 uses
+  state: null                      # 3 uses
+  ndevelopers: null                # 3 uses  
+  nclients: null                   # 3 uses
+  looklike: null                   # 3 uses
+  forfun: null                     # 3 uses
+  dailyclients: null               # 3 uses
+  wear: null                       # 3 uses
+  friend: null                     # 7 uses
+  ethics: null                     # 2 uses
+  question: null                   # 2 uses
+  os: null                         # 2 uses - operating system
+  memory: null                     # 2 uses
+  job: null                        # 2 uses
+  hair: null                       # 2 uses
+  girlfriend: null                 # 2 uses
+  favoritetea: null                # 2 uses
+  favoriteseason: null             # 2 uses
+  favoriteopera: null              # 2 uses
+  favoriteoccupation: null         # 2 uses
+  country: null                    # 2 uses
+  city: null                       # 2 uses
+  build: null                      # 2 uses
+  boyfriend: null                  # 2 uses
+  richness: null                   # 1 use
+  orientation: null                # 1 use
+  mother: null                     # 1 use
+  maxclients: null                 # 1 use
+  hourlyqueries: null              # 1 use
+  favortemovie: null               # 1 use (typo in original)
+  favoritequestion: null           # 1 use
+  favoritephilosopher: null        # 1 use
+  faily: null                      # 1 use (likely typo for "family")
+  developers: null                 # 1 use
+  clients: null                    # 1 use
+  birthdate: null                  # 1 use
+  Alignment: null                  # 1 use (capitalized in original)
+  
+  # Favorites (template placeholders)
+  favoriteactor: null              # 8 uses
+  favoriteshow: null               # 4 uses
+  favoritebook: null               # 4 uses
+  favoriteband: null               # 4 uses
+  favoriteactress: null            # 4 uses
+  favoritesong: null               # 4 uses
+  favoritesubject: null            # 3 uses
+  favoritesport: null              # 3 uses
+  favoriteauthor: null             # 3 uses
+  favoriteartist: null             # 3 uses
+  
+  # NOTE: This collection is identical to alice_foundation - same 84 properties total
   # All properties are template placeholders requiring runtime values
 files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/ai.aiml"

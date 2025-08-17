@@ -25,6 +25,7 @@ bot_properties:
   sign: null                       # 2 uses - zodiac sign
   religion: null                   # 2 uses - religious beliefs
   friends: null                    # 2 uses - friend references
+  friend: null                     # 1 use - singular form of friends
   favoritemovie: null              # 2 uses - favorite movie
   
   # Extended personal profile (single uses each)

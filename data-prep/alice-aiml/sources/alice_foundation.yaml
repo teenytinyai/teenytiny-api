@@ -23,10 +23,12 @@ bot_properties:
   president: null                  # 17 uses - current president
   kingdom: null                    # 17 uses - taxonomic kingdom
   emotions: null                   # 17 uses - emotional capabilities
+  emotion: null                    # 1 use - singular form of emotions
   
   # Physical/personal characteristics
   size: null                       # 15 uses - physical size
   feelings: null                   # 14 uses - feeling capabilities
+  feeling: null                    # 1 use - singular form of feelings
   family: null                     # 14 uses - family classification
   birthplace: null                 # 14 uses - where created/born
   friends: null                    # 13 uses - friend references
