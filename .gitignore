@@ -2,7 +2,7 @@ node_modules
 build
 dist
 .gradle
-gradle/wrapper
+gradle
 .vitest/
 .env
 .vscode/
