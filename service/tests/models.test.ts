@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { EchoModel } from '../src/models/echo-model.js';
 import { DelayModelware } from '../src/modelware/delay-modelware.js';
+import { StreamSplitModelware } from '../src/modelware/stream-split-modelware.js';
 
 describe('Simple Model Interface', () => {
   describe('EchoModel', () => {
-    it('should echo back input text', async () => {
+    it('should echo back input text as single chunk', async () => {
       const model = new EchoModel();
       const chunks: string[] = [];
       
@@ -12,7 +13,7 @@ describe('Simple Model Interface', () => {
         chunks.push(chunk);
       }
       
-      expect(chunks.join('').trim()).toBe('hello world');
+      expect(chunks).toEqual(['hello world']);
     });
 
     it('should return default message for empty input', async () => {
@@ -23,19 +24,35 @@ describe('Simple Model Interface', () => {
         chunks.push(chunk);
       }
       
-      const result = chunks.join('').trim();
-      expect(result).toBe("Hello! I'm the Echo model. Send me a message and I'll echo it back.");
+      expect(chunks).toEqual(["Hello! I'm the Echo model. Send me a message and I'll echo it back."]);
     });
+  });
 
-    it('should stream word by word', async () => {
-      const model = new EchoModel();
+  describe('StreamSplitModelware', () => {
+    it('should split text into words matching original EchoModel behavior', async () => {
+      const baseModel = new EchoModel();
+      const splitModel = new StreamSplitModelware(baseModel, StreamSplitModelware.WORDS);
+      
       const chunks: string[] = [];
       
-      for await (const chunk of model.process('one two three')) {
+      for await (const chunk of splitModel.process('hello world test')) {
         chunks.push(chunk);
       }
       
-      expect(chunks).toEqual(['one ', 'two ', 'three']);
+      expect(chunks).toEqual(['hello', ' world', ' test']);
+    });
+
+    it('should handle sentences', async () => {
+      const baseModel = new EchoModel();
+      const splitModel = new StreamSplitModelware(baseModel, StreamSplitModelware.SENTENCES);
+      
+      const chunks: string[] = [];
+      
+      for await (const chunk of splitModel.process('Hello world. How are you?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toEqual(['Hello world', '. ', 'How are you', '?']);
     });
   });
 
@@ -47,14 +64,14 @@ describe('Simple Model Interface', () => {
       const start = Date.now();
       const chunks: string[] = [];
       
-      for await (const chunk of delayModel.process('a b')) {
+      for await (const chunk of delayModel.process('test')) {
         chunks.push(chunk);
       }
       
       const duration = Date.now() - start;
       
-      expect(chunks).toEqual(['a ', 'b']);
-      expect(duration).toBeGreaterThan(15); // At least 2 delays of 10ms
+      expect(chunks).toEqual(['test']);
+      expect(duration).toBeGreaterThan(8); // At least 1 delay of 10ms
     });
 
     it('should preserve the underlying model output', async () => {
@@ -67,27 +84,27 @@ describe('Simple Model Interface', () => {
         chunks.push(chunk);
       }
       
-      expect(chunks.join('').trim()).toBe('test input');
+      expect(chunks).toEqual(['test input']);
     });
   });
 
   describe('Model Composition', () => {
     it('should allow chaining multiple decorators', async () => {
       const baseModel = new EchoModel();
-      const delayedModel = new DelayModelware(baseModel, 5);
-      const doubleDelayedModel = new DelayModelware(delayedModel, 5);
+      const splitModel = new StreamSplitModelware(baseModel, StreamSplitModelware.WORDS);
+      const delayedModel = new DelayModelware(splitModel, 5);
       
       const start = Date.now();
       const chunks: string[] = [];
       
-      for await (const chunk of doubleDelayedModel.process('a b')) {
+      for await (const chunk of delayedModel.process('a b')) {
         chunks.push(chunk);
       }
       
       const duration = Date.now() - start;
       
-      expect(chunks).toEqual(['a ', 'b']);
-      expect(duration).toBeGreaterThan(18); // At least 4 delays of 5ms each
+      expect(chunks).toEqual(['a', ' b']);
+      expect(duration).toBeGreaterThan(8); // At least 2 delays of 5ms each
     });
   });
 });

@@ -53,7 +53,7 @@ run_test_suite() {
             local errors=$(grep -o 'errors="[0-9]*"' "$xml_file" | grep -o '[0-9]*' || echo "0")
 
             if [[ "$failures" -gt 0 ]] || [[ "$errors" -gt 0 ]]; then
-                printf "💥 Finished suite %-20s with failures see reports/%s.log\n" "$suite_name" "$suite_name"
+                printf "💥 Finished suite %-20s failed see reports/%s.log\n" "$suite_name" "$suite_name"
                 echo "FAILED" >"$SCRIPT_DIR/reports/${suite_name}.result"
             else
                 printf "✅ Finished suite %-20s success\n" "$suite_name"

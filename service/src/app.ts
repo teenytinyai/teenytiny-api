@@ -13,6 +13,7 @@ import { ModelRegistry } from './models/model-registry.js';
 import { OpenAIModelRegistry } from './openai-protocol/openai-model-registry.js';
 import { EchoModel } from './models/echo-model.js';
 import { DelayModelware } from './modelware/delay-modelware.js';
+import { StreamSplitModelware } from './modelware/stream-split-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
 import { corsMiddleware } from './middleware/cors.js';
 import { createLoggingMiddleware } from './middleware/logging.js';
@@ -31,7 +32,8 @@ export function createApp(config: AppConfig) {
   
   // Create models with composition
   const echoModel = new EchoModel();
-  const delayedEchoModel = new DelayModelware(echoModel, 50);
+  const streamSplitEcho = new StreamSplitModelware(echoModel, StreamSplitModelware.WORDS);
+  const delayedEchoModel = new DelayModelware(streamSplitEcho, 50);
   
   openaiRegistry.register('echo', delayedEchoModel);
 
