@@ -1,45 +1,25 @@
-# Dependencies
-service/node_modules/
-integration-tests/*/node_modules/
-
-# Build output
-service/dist/
-
-# Environment variables
+node_modules
+build
+dist
+.gradle
+gradle/wrapper
+.vitest/
 .env
-infra/.env
-
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Logs
 *.log
 npm-debug.log*
-
-# Coverage directory used by tools like istanbul
 coverage/
 *.lcov
-
-# Temporary folders
 tmp/
 temp/
-
-# Wrangler generated files
 .wrangler/
 wrangler-local.sqlite
-
-# Terraform files (keep .terraform.lock.hcl)
-infra/terraform/.terraform/
-infra/terraform/terraform.tfstate*
-infra/terraform/*.tfplan
-infra/terraform/*.tfstate*
-
-# Test artifacts
-.vitest/
+.terraform/
+terraform.tfstate*
+*.tfplan
+*.tfstate*

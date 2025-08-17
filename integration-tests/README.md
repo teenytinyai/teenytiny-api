@@ -12,6 +12,7 @@ Integration testing suite for TeenyTiny AI service compatibility with various cl
 | **[node-openai](node-openai/)** | JavaScript (Node.js) | [openai](https://github.com/openai/openai-node) |
 | **[node-vercel-ai-v4](node-vercel-ai-v4/)** | JavaScript (Node.js) | [ai](https://ai-sdk.dev/) (v4) |
 | **[node-vercel-ai-v5](node-vercel-ai-v5/)** | JavaScript (Node.js) | [ai](https://v5.ai-sdk.dev/) (v5) |
+| **[java-openai](java-openai/)** | Java | [com.openai:openai-java](https://github.com/openai/openai-java) |
 
 ## Quick Start
 
