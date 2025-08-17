@@ -16,4 +16,4 @@ echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
 # Install dependencies quietly
 pip install -q -r requirements.txt
 
-pytest --tb=short --no-header "$@"
+pytest --tb=short --no-header -p no:warnings "$@"
