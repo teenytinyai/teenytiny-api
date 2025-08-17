@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Navigate to the node-openai test directory
+cd "$(dirname "$0")"
+
+# Check if node_modules exists, install if not
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..."
+    npm install --silent
+fi
+
+# Run tests with minimal output
+echo "Running Node.js OpenAI SDK integration tests..."
+npm test
