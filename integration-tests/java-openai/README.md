@@ -26,6 +26,4 @@ ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
 
 ChatCompletion completion = client.chat().completions().create(params);
 System.out.println(completion.choices().get(0).message().content().get());
-
 ```
-

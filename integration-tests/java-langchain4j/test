@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+# Change to the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Use environment variables or defaults
+export TEENYTINY_URL=${TEENYTINY_URL:-"http://localhost:8080"}
+export TEENYTINY_API_KEY=${TEENYTINY_API_KEY:-"testkey"}
+
+echo "Running Java LangChain4j integration tests..."
+echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
+echo
+
+# Generate gradle wrapper if it doesn't exist
+if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+    echo "Generating Gradle wrapper..."
+    gradle wrapper >/dev/null 2>&1
+fi
+
+# Run Gradle tests
+./gradlew test --no-daemon --rerun-tasks "$@"
