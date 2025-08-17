@@ -117,12 +117,12 @@ fi
 
 # Step 1: Build the application
 echo -e "${BLUE}🔨 Building application...${NC}"
-cd "$PROJECT_ROOT"
+cd "$PROJECT_ROOT/service"
 npm run build
 
 # Check if build output exists
-if [ ! -f "$PROJECT_ROOT/dist/index.js" ]; then
-    echo -e "${RED}❌ Build failed - dist/index.js not found${NC}"
+if [ ! -f "$PROJECT_ROOT/service/dist/index.js" ]; then
+    echo -e "${RED}❌ Build failed - service/dist/index.js not found${NC}"
     exit 1
 fi
 
@@ -159,7 +159,7 @@ rm -f "$ENVIRONMENT.tfplan"
 
 # Step 5: Deploy Worker code with Wrangler
 echo -e "${BLUE}📦 Deploying Worker code...${NC}"
-cd "$PROJECT_ROOT"
+cd "$PROJECT_ROOT/service"
 
 # Deploy with configuration from environments.yaml (no wrangler env blocks needed)
 npx wrangler deploy \

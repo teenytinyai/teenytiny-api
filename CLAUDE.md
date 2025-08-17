@@ -114,3 +114,5 @@ src/
 - Environment-based API key configuration
 - No hardcoded secrets in code
 - Proper CORS handling for browser requests
+
+- Git commit messages should describe the final state of the commit, not all the steps we took along the way

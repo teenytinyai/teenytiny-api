@@ -1,8 +1,8 @@
 # Dependencies
-node_modules/
+service/node_modules/
 
 # Build output
-dist/
+service/dist/
 
 # Environment variables
 .env
