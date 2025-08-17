@@ -15,6 +15,7 @@ Integration testing suite for TeenyTiny AI service compatibility with various cl
 | **[java-openai](java-openai/)** | Java | [com.openai](https://github.com/openai/openai-java) |
 | **[java-spring-ai](java-spring-ai/)** | Java | [org.springframework.ai](https://docs.spring.io/spring-ai/reference/) |
 | **[go-openai](go-openai/)** | Go | [github.com/sashabaranov/go-openai](https://github.com/sashabaranov/go-openai) |
+| **[ruby-openai](ruby-openai/)** | Ruby | [openai](https://github.com/alexrudall/ruby-openai) |
 
 ## Quick Start
 
