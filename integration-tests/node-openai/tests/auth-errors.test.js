@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import OpenAI from 'openai';
 
 // Configuration
@@ -13,16 +12,22 @@ describe('Authentication and Error Handling', () => {
       baseURL: `${TEENYTINY_URL}/v1`,
     });
 
+    await expect(async () => {
+      await invalidClient.chat.completions.create({
+        model: 'echo',
+        messages: [{ role: 'user', content: 'Hello' }],
+      });
+    }).rejects.toThrow();
+
     try {
       await invalidClient.chat.completions.create({
         model: 'echo',
         messages: [{ role: 'user', content: 'Hello' }],
       });
-      assert.fail('Expected authentication error');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be a 401 error
-      assert.ok(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized'));
+      expect(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized')).toBe(true);
     }
   });
 
@@ -37,10 +42,10 @@ describe('Authentication and Error Handling', () => {
         model: 'echo',
         messages: [{ role: 'user', content: 'Hello' }],
       });
-      assert.fail('Expected authentication error');
+      expect.fail('Expected authentication error');
     } catch (error) {
-      assert.ok(error instanceof Error);
-      assert.ok(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized'));
+      expect(error).toBeInstanceOf(Error);
+      expect(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized')).toBe(true);
     }
   });
 
@@ -55,11 +60,11 @@ describe('Authentication and Error Handling', () => {
         model: 'nonexistent-model',
         messages: [{ role: 'user', content: 'Hello' }],
       });
-      assert.fail('Expected model error');
+      expect.fail('Expected model error');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be a 400 error for invalid model
-      assert.ok(error.status === 400 || error.message.includes('400') || error.message.includes('model'));
+      expect(error.status === 400 || error.message.includes('400') || error.message.includes('model')).toBe(true);
     }
   });
 
@@ -74,11 +79,11 @@ describe('Authentication and Error Handling', () => {
         model: 'echo',
         messages: [],
       });
-      assert.fail('Expected validation error');
+      expect.fail('Expected validation error');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be a 400 error for invalid request
-      assert.ok(error.status === 400 || error.message.includes('400') || error.message.includes('messages'));
+      expect(error.status === 400 || error.message.includes('400') || error.message.includes('messages')).toBe(true);
     }
   });
 
@@ -93,10 +98,10 @@ describe('Authentication and Error Handling', () => {
         model: 'echo',
         messages: [{ invalid_field: 'value' }], // Missing required 'role' and 'content'
       });
-      assert.fail('Expected validation error');
+      expect.fail('Expected validation error');
     } catch (error) {
-      assert.ok(error instanceof Error);
-      assert.ok(error.status === 400 || error.message.includes('400'));
+      expect(error).toBeInstanceOf(Error);
+      expect(error.status === 400 || error.message.includes('400')).toBe(true);
     }
   });
 
@@ -104,6 +109,7 @@ describe('Authentication and Error Handling', () => {
     const unreachableClient = new OpenAI({
       apiKey: TEENYTINY_API_KEY,
       baseURL: 'http://nonexistent-host:9999/v1',
+      timeout: 2000, // 2 second timeout for network requests
     });
 
     try {
@@ -111,11 +117,11 @@ describe('Authentication and Error Handling', () => {
         model: 'echo',
         messages: [{ role: 'user', content: 'Hello' }],
       });
-      assert.fail('Expected network error');
+      expect.fail('Expected network error');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be a connection/network error - accept various network error types
-      assert.ok(
+      expect(
         error.code === 'ECONNREFUSED' ||
         error.code === 'ENOTFOUND' ||
         error.code === 'EAI_NODATA' ||
@@ -124,7 +130,7 @@ describe('Authentication and Error Handling', () => {
         error.message.includes('ENOTFOUND') ||
         error.message.includes('nonexistent-host') ||
         error.cause?.code === 'ENOTFOUND'
-      );
+      ).toBe(true);
     }
   });
 
@@ -145,13 +151,12 @@ describe('Authentication and Error Handling', () => {
 
     // All requests should have failed with authentication errors
     results.forEach((result, i) => {
-      assert.ok(result instanceof Error, `Request ${i} should have failed`);
-      assert.ok(
+      expect(result).toBeInstanceOf(Error);
+      expect(
         result.status === 401 || 
         result.message.includes('401') || 
-        result.message.includes('Unauthorized'),
-        `Request ${i} should be authentication error`
-      );
+        result.message.includes('Unauthorized')
+      ).toBe(true);
     });
   });
 
@@ -173,10 +178,10 @@ describe('Authentication and Error Handling', () => {
         // Should not reach here
       }
 
-      assert.fail('Expected authentication error');
+      expect.fail('Expected authentication error');
     } catch (error) {
-      assert.ok(error instanceof Error);
-      assert.ok(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized'));
+      expect(error).toBeInstanceOf(Error);
+      expect(error.status === 401 || error.message.includes('401') || error.message.includes('Unauthorized')).toBe(true);
     }
   });
 
@@ -194,10 +199,10 @@ describe('Authentication and Error Handling', () => {
         temperature: 5.0, // Outside normal range
       });
       // If it succeeds, that's fine - service is permissive
-      assert.ok(response.choices[0].message.content);
+      expect(response.choices[0].message.content).toBeTruthy();
     } catch (error) {
       // If it fails, that's also acceptable - service validates parameters
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
     }
 
     // Test negative max_tokens
@@ -208,10 +213,10 @@ describe('Authentication and Error Handling', () => {
         max_tokens: -1,
       });
       // If it succeeds, that's fine
-      assert.ok(response.choices[0].message.content);
+      expect(response.choices[0].message.content).toBeTruthy();
     } catch (error) {
       // If it fails, that's also acceptable
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
     }
   });
 });

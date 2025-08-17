@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import OpenAI from 'openai';
 
 // Configuration
@@ -21,10 +20,10 @@ describe('Basic OpenAI SDK Integration', () => {
       ],
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Hello World');
-    assert.strictEqual(completion.model, 'echo');
-    assert.strictEqual(completion.object, 'chat.completion');
-    assert.ok(completion.usage.total_tokens > 0);
+    expect(completion.choices[0].message.content).toBe('Hello World');
+    expect(completion.model).toBe('echo');
+    expect(completion.object).toBe('chat.completion');
+    expect(completion.usage.total_tokens).toBeGreaterThan(0);
   });
 
   test('multi-message conversation (should return last user message)', async () => {
@@ -38,7 +37,7 @@ describe('Basic OpenAI SDK Integration', () => {
       ],
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Last message');
+    expect(completion.choices[0].message.content).toBe('Last message');
   });
 
   test('system prompt with user message', async () => {
@@ -51,7 +50,7 @@ describe('Basic OpenAI SDK Integration', () => {
     });
 
     // Echo model should return the user message, ignoring system prompt
-    assert.strictEqual(completion.choices[0].message.content, 'Test message');
+    expect(completion.choices[0].message.content).toBe('Test message');
   });
 
   test('no user messages (system only) returns default response', async () => {
@@ -64,7 +63,7 @@ describe('Basic OpenAI SDK Integration', () => {
 
     // Should get the default echo model greeting
     const content = completion.choices[0].message.content;
-    assert.ok(content.includes('Echo model'), `Expected default response, got: ${content}`);
+    expect(content).toContain('Echo model');
   });
 
   test('response structure matches OpenAI format', async () => {
@@ -74,27 +73,27 @@ describe('Basic OpenAI SDK Integration', () => {
     });
 
     // Check required fields
-    assert.ok(completion.id);
-    assert.strictEqual(completion.object, 'chat.completion');
-    assert.ok(completion.created);
-    assert.strictEqual(completion.model, 'echo');
-    assert.ok(Array.isArray(completion.choices));
-    assert.ok(completion.usage);
+    expect(completion.id).toBeTruthy();
+    expect(completion.object).toBe('chat.completion');
+    expect(completion.created).toBeTruthy();
+    expect(completion.model).toBe('echo');
+    expect(Array.isArray(completion.choices)).toBe(true);
+    expect(completion.usage).toBeTruthy();
 
     // Check choice structure
     const choice = completion.choices[0];
-    assert.strictEqual(choice.index, 0);
-    assert.ok(choice.message);
-    assert.strictEqual(choice.finish_reason, 'stop');
+    expect(choice.index).toBe(0);
+    expect(choice.message).toBeTruthy();
+    expect(choice.finish_reason).toBe('stop');
 
     // Check message structure
-    assert.strictEqual(choice.message.role, 'assistant');
-    assert.strictEqual(choice.message.content, 'Structure test');
+    expect(choice.message.role).toBe('assistant');
+    expect(choice.message.content).toBe('Structure test');
 
     // Check usage structure
-    assert.ok(typeof completion.usage.prompt_tokens === 'number');
-    assert.ok(typeof completion.usage.completion_tokens === 'number');
-    assert.ok(typeof completion.usage.total_tokens === 'number');
+    expect(typeof completion.usage.prompt_tokens).toBe('number');
+    expect(typeof completion.usage.completion_tokens).toBe('number');
+    expect(typeof completion.usage.total_tokens).toBe('number');
   });
 
   test('empty message handling', async () => {
@@ -104,7 +103,7 @@ describe('Basic OpenAI SDK Integration', () => {
     });
 
     // Empty input should be handled gracefully
-    assert.ok(typeof completion.choices[0].message.content === 'string');
+    expect(typeof completion.choices[0].message.content).toBe('string');
   });
 
   test('special characters and unicode', async () => {
@@ -115,7 +114,7 @@ describe('Basic OpenAI SDK Integration', () => {
       messages: [{ role: 'user', content: testMessage }],
     });
 
-    assert.strictEqual(completion.choices[0].message.content, testMessage);
+    expect(completion.choices[0].message.content).toBe(testMessage);
   });
 
   test('multiline content', async () => {
@@ -129,6 +128,6 @@ Final line`;
       messages: [{ role: 'user', content: multilineMessage }],
     });
 
-    assert.strictEqual(completion.choices[0].message.content, multilineMessage);
+    expect(completion.choices[0].message.content).toBe(multilineMessage);
   });
 });

@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText, streamText } from 'ai';
 
@@ -23,7 +22,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       temperature: 0.7,
     });
 
-    assert.strictEqual(text, 'Temperature test');
+    expect(text).toBe('Temperature test');
   });
 
   test('maxTokens parameter', async () => {
@@ -33,7 +32,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       maxTokens: 100,
     });
 
-    assert.strictEqual(text, 'Max tokens test');
+    expect(text).toBe('Max tokens test');
   });
 
   test('topP parameter', async () => {
@@ -43,7 +42,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       topP: 0.9,
     });
 
-    assert.strictEqual(text, 'Top P test');
+    expect(text).toBe('Top P test');
   });
 
   test('multiple parameters together', async () => {
@@ -55,7 +54,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       topP: 0.95,
     });
 
-    assert.strictEqual(text, 'Multiple params test');
+    expect(text).toBe('Multiple params test');
   });
 
   test('streaming with parameters', async () => {
@@ -71,7 +70,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, 'Streaming with params');
+    expect(fullContent).toBe('Streaming with params');
   });
 
   test('presencePenalty parameter', async () => {
@@ -82,7 +81,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
     });
 
     // Echo model should still return the input regardless of penalty
-    assert.strictEqual(text, 'Presence penalty test');
+    expect(text).toBe('Presence penalty test');
   });
 
   test('frequencyPenalty parameter', async () => {
@@ -92,7 +91,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       frequencyPenalty: 0.3,
     });
 
-    assert.strictEqual(text, 'Frequency penalty test');
+    expect(text).toBe('Frequency penalty test');
   });
 
   test('stopSequences parameter', async () => {
@@ -103,7 +102,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       stopSequences: ['\n', '.'],
     });
 
-    assert.strictEqual(text, 'Stop sequence test');
+    expect(text).toBe('Stop sequence test');
   });
 
   test('seed parameter for deterministic responses', async () => {
@@ -121,8 +120,8 @@ describe('Parameter Options with Vercel AI SDK', () => {
     });
 
     // Both should return the same content (echo model behavior)
-    assert.strictEqual(result1.text, result2.text);
-    assert.strictEqual(result1.text, 'Seed test');
+    expect(result1.text).toBe(result2.text);
+    expect(result1.text).toBe('Seed test');
   });
 
   test('messages with system prompt and parameters', async () => {
@@ -137,7 +136,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
     });
 
     // Echo model should return the user message
-    assert.strictEqual(text, 'System with params test');
+    expect(text).toBe('System with params test');
   });
 
   test('streaming messages with parameters', async () => {
@@ -156,7 +155,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, 'Streaming messages with params');
+    expect(fullContent).toBe('Streaming messages with params');
   });
 
   test('empty parameters object handling', async () => {
@@ -167,7 +166,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       // Only required parameters, no optional ones
     });
 
-    assert.strictEqual(text, 'Minimal params test');
+    expect(text).toBe('Minimal params test');
   });
 
   test('usage information with parameters', async () => {
@@ -178,12 +177,12 @@ describe('Parameter Options with Vercel AI SDK', () => {
       maxTokens: 50,
     });
 
-    assert.strictEqual(result.text, 'Usage with params test');
-    assert.ok(result.usage);
-    assert.ok(typeof result.usage.promptTokens === 'number');
-    assert.ok(typeof result.usage.completionTokens === 'number');
-    assert.ok(typeof result.usage.totalTokens === 'number');
-    assert.ok(result.usage.totalTokens > 0);
+    expect(result.text).toBe('Usage with params test');
+    expect(result.usage).toBeTruthy();
+    expect(typeof result.usage.promptTokens).toBe('number');
+    expect(typeof result.usage.completionTokens).toBe('number');
+    expect(typeof result.usage.totalTokens).toBe('number');
+    expect(result.usage.totalTokens).toBeGreaterThan(0);
   });
 
   test('finish reason with parameters', async () => {
@@ -194,7 +193,7 @@ describe('Parameter Options with Vercel AI SDK', () => {
       maxTokens: 200,
     });
 
-    assert.strictEqual(result.text, 'Finish reason with params test');
-    assert.strictEqual(result.finishReason, 'stop');
+    expect(result.text).toBe('Finish reason with params test');
+    expect(result.finishReason).toBe('stop');
   });
 });

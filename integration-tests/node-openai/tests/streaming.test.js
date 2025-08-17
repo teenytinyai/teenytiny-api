@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import OpenAI from 'openai';
 
 // Configuration
@@ -29,8 +28,8 @@ describe('Streaming Integration', () => {
       fullContent += content;
     }
 
-    assert.strictEqual(fullContent, 'Hello streaming world');
-    assert.ok(chunkCount > 0, 'Should receive multiple chunks');
+    expect(fullContent).toBe('Hello streaming world');
+    expect(chunkCount).toBeGreaterThan(0);
   });
 
   test('streaming vs non-streaming returns same content', async () => {
@@ -55,8 +54,8 @@ describe('Streaming Integration', () => {
       streamContent += chunk.choices[0]?.delta?.content || '';
     }
 
-    assert.strictEqual(regular.choices[0].message.content, streamContent);
-    assert.strictEqual(streamContent, testMessage);
+    expect(regular.choices[0].message.content).toBe(streamContent);
+    expect(streamContent).toBe(testMessage);
   });
 
   test('streaming with system prompt', async () => {
@@ -75,7 +74,7 @@ describe('Streaming Integration', () => {
     }
 
     // Echo model should return the user message part
-    assert.strictEqual(fullContent, 'Streaming system test');
+    expect(fullContent).toBe('Streaming system test');
   });
 
   test('streaming chunk structure', async () => {
@@ -90,26 +89,26 @@ describe('Streaming Integration', () => {
       chunks.push(chunk);
     }
 
-    assert.ok(chunks.length > 0, 'Should receive chunks');
+    expect(chunks.length).toBeGreaterThan(0);
 
     // Check first chunk structure
     const firstChunk = chunks[0];
-    assert.ok(firstChunk.id);
-    assert.strictEqual(firstChunk.object, 'chat.completion.chunk');
-    assert.ok(firstChunk.created);
-    assert.strictEqual(firstChunk.model, 'echo');
-    assert.ok(Array.isArray(firstChunk.choices));
+    expect(firstChunk.id).toBeTruthy();
+    expect(firstChunk.object).toBe('chat.completion.chunk');
+    expect(firstChunk.created).toBeTruthy();
+    expect(firstChunk.model).toBe('echo');
+    expect(Array.isArray(firstChunk.choices)).toBe(true);
 
     // Check that we get content chunks
     const contentChunks = chunks.filter(c => 
       c.choices[0]?.delta?.content && c.choices[0].delta.content.length > 0
     );
-    assert.ok(contentChunks.length > 0, 'Should receive content chunks');
+    expect(contentChunks.length).toBeGreaterThan(0);
 
     // Check last chunk has finish_reason
     const lastChunk = chunks[chunks.length - 1];
     if (lastChunk.choices[0]?.finish_reason) {
-      assert.strictEqual(lastChunk.choices[0].finish_reason, 'stop');
+      expect(lastChunk.choices[0].finish_reason).toBe('stop');
     }
   });
 
@@ -126,7 +125,7 @@ describe('Streaming Integration', () => {
     }
 
     // Should handle empty input gracefully
-    assert.ok(typeof fullContent === 'string');
+    expect(typeof fullContent).toBe('string');
   });
 
   test('streaming longer message', async () => {
@@ -144,7 +143,7 @@ describe('Streaming Integration', () => {
       fullContent += chunk.choices[0]?.delta?.content || '';
     }
 
-    assert.strictEqual(fullContent, longerMessage);
+    expect(fullContent).toBe(longerMessage);
   });
 
   test('streaming multiline content', async () => {
@@ -164,12 +163,12 @@ Final line`;
       fullContent += chunk.choices[0]?.delta?.content || '';
     }
 
-    assert.strictEqual(fullContent, multilineMessage);
+    expect(fullContent).toBe(multilineMessage);
   });
 
   test('streaming error handling', async () => {
     // This test ensures streaming properly handles and throws errors
-    try {
+    await expect(async () => {
       const stream = await openai.chat.completions.create({
         model: 'nonexistent-model',
         messages: [{ role: 'user', content: 'Test' }],
@@ -180,11 +179,6 @@ Final line`;
       for await (const chunk of stream) {
         // Should not reach here
       }
-
-      assert.fail('Expected an error to be thrown');
-    } catch (error) {
-      // Should catch an error related to the invalid model
-      assert.ok(error instanceof Error);
-    }
+    }).rejects.toThrow();
   });
 });

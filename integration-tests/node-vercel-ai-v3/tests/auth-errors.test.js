@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
@@ -15,16 +14,23 @@ describe('Authentication and Error Handling', () => {
     });
     const model = provider('echo');
 
+    await expect(async () => {
+      await generateText({
+        model: model,
+        prompt: 'This should fail',
+      });
+    }).rejects.toThrow();
+
     try {
       await generateText({
         model: model,
         prompt: 'This should fail',
       });
       
-      assert.fail('Expected an authentication error to be thrown');
+      expect.fail('Expected an authentication error to be thrown');
     } catch (error) {
       // Should get an authentication error
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Vercel AI SDK may wrap the error, so check for various auth-related messages
       const errorMessage = error.message.toLowerCase();
       const hasAuthError = errorMessage.includes('auth') || 
@@ -32,7 +38,7 @@ describe('Authentication and Error Handling', () => {
                           errorMessage.includes('401') ||
                           errorMessage.includes('invalid') ||
                           errorMessage.includes('key');
-      assert.ok(hasAuthError, `Expected auth error, got: ${error.message}`);
+      expect(hasAuthError).toBe(true);
     }
   });
 
@@ -49,9 +55,9 @@ describe('Authentication and Error Handling', () => {
         prompt: 'This should fail',
       });
       
-      assert.fail('Expected an authentication error to be thrown');
+      expect.fail('Expected an authentication error to be thrown');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Check for authentication-related error
       const errorMessage = error.message.toLowerCase();
       const hasAuthError = errorMessage.includes('auth') || 
@@ -59,7 +65,7 @@ describe('Authentication and Error Handling', () => {
                           errorMessage.includes('401') ||
                           errorMessage.includes('invalid') ||
                           errorMessage.includes('key');
-      assert.ok(hasAuthError, `Expected auth error, got: ${error.message}`);
+      expect(hasAuthError).toBe(true);
     }
   });
 
@@ -76,16 +82,16 @@ describe('Authentication and Error Handling', () => {
         prompt: 'This should fail',
       });
       
-      assert.fail('Expected a model not found error to be thrown');
+      expect.fail('Expected a model not found error to be thrown');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be related to model not found
       const errorMessage = error.message.toLowerCase();
       const hasModelError = errorMessage.includes('model') || 
                            errorMessage.includes('not found') || 
                            errorMessage.includes('404') ||
                            errorMessage.includes('nonexistent');
-      assert.ok(hasModelError, `Expected model error, got: ${error.message}`);
+      expect(hasModelError).toBe(true);
     }
   });
 
@@ -93,6 +99,12 @@ describe('Authentication and Error Handling', () => {
     const provider = createOpenAI({
       apiKey: 'testkey',
       baseURL: 'http://nonexistent-host-12345.example.com/v1',
+      fetch: (url, options) => {
+        // Set a short timeout for this network test
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 2000); // 2 second timeout
+        return fetch(url, { ...options, signal: controller.signal });
+      },
     });
     const model = provider('echo');
 
@@ -102,9 +114,9 @@ describe('Authentication and Error Handling', () => {
         prompt: 'This should fail due to network',
       });
       
-      assert.fail('Expected a network error to be thrown');
+      expect.fail('Expected a network error to be thrown');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Network errors can have various forms, check for common patterns
       const errorMessage = error.message.toLowerCase();
       const hasNetworkError = errorMessage.includes('fetch') || 
@@ -114,7 +126,7 @@ describe('Authentication and Error Handling', () => {
                              errorMessage.includes('refused') ||
                              error.cause?.code === 'ENOTFOUND' ||
                              error.cause?.code === 'ECONNREFUSED';
-      assert.ok(hasNetworkError, `Expected network error, got: ${error.message}`);
+      expect(hasNetworkError).toBe(true);
     }
   });
 
@@ -133,9 +145,9 @@ describe('Authentication and Error Handling', () => {
         ],
       });
       
-      assert.fail('Expected a validation error to be thrown');
+      expect.fail('Expected a validation error to be thrown');
     } catch (error) {
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
       // Should be related to validation or bad request
       const errorMessage = error.message.toLowerCase();
       const hasValidationError = errorMessage.includes('validation') || 
@@ -143,7 +155,7 @@ describe('Authentication and Error Handling', () => {
                                 errorMessage.includes('role') ||
                                 errorMessage.includes('400') ||
                                 errorMessage.includes('bad request');
-      assert.ok(hasValidationError, `Expected validation error, got: ${error.message}`);
+      expect(hasValidationError).toBe(true);
     }
   });
 
@@ -164,14 +176,14 @@ describe('Authentication and Error Handling', () => {
       });
       
       // If it succeeds (which it likely will with echo model), that's fine
-      assert.strictEqual(result.text, 'Timeout test');
+      expect(result.text).toBe('Timeout test');
     } catch (error) {
       // If there's a timeout error, verify it's timeout-related
       if (error instanceof Error) {
         const errorMessage = error.message.toLowerCase();
         if (errorMessage.includes('timeout') || errorMessage.includes('abort')) {
           // This is expected for timeout scenarios
-          assert.ok(true, 'Timeout error handled properly');
+          expect(true).toBe(true);
         } else {
           // Re-throw if it's not a timeout error we're testing for
           throw error;

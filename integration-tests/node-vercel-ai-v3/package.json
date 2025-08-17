@@ -4,11 +4,15 @@
   "description": "Integration tests for TeenyTiny AI with Vercel AI SDK v3",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "ai": "^3.3.0",
     "@ai-sdk/openai": "^0.0.66"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.5"
   },
   "engines": {
     "node": ">=18"

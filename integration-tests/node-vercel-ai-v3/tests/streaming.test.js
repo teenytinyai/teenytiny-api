@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 
@@ -27,7 +26,7 @@ describe('Streaming Vercel AI SDK Integration', () => {
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, 'Hello streaming world');
+    expect(fullContent).toBe('Hello streaming world');
   });
 
   test('streaming with messages', async () => {
@@ -45,7 +44,7 @@ describe('Streaming Vercel AI SDK Integration', () => {
     }
 
     // Echo model should return the user message
-    assert.strictEqual(fullContent, 'Streaming system test');
+    expect(fullContent).toBe('Streaming system test');
   });
 
   test('streaming usage information', async () => {
@@ -62,17 +61,17 @@ describe('Streaming Vercel AI SDK Integration', () => {
 
     // Check final result
     const finalResult = await result.finishReason;
-    assert.strictEqual(finalResult, 'stop');
+    expect(finalResult).toBe('stop');
 
     // Check usage (available after streaming completes)
     const usage = await result.usage;
-    assert.ok(usage);
-    assert.ok(typeof usage.promptTokens === 'number');
-    assert.ok(typeof usage.completionTokens === 'number');
-    assert.ok(typeof usage.totalTokens === 'number');
-    assert.ok(usage.totalTokens > 0);
+    expect(usage).toBeTruthy();
+    expect(typeof usage.promptTokens).toBe('number');
+    expect(typeof usage.completionTokens).toBe('number');
+    expect(typeof usage.totalTokens).toBe('number');
+    expect(usage.totalTokens).toBeGreaterThan(0);
 
-    assert.strictEqual(fullContent, 'Usage test stream');
+    expect(fullContent).toBe('Usage test stream');
   });
 
   test('streaming with parameters', async () => {
@@ -89,7 +88,7 @@ describe('Streaming Vercel AI SDK Integration', () => {
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, 'Parameter stream test');
+    expect(fullContent).toBe('Parameter stream test');
   });
 
   test('streaming empty message', async () => {
@@ -104,7 +103,7 @@ describe('Streaming Vercel AI SDK Integration', () => {
     }
 
     // Should handle empty input gracefully
-    assert.ok(typeof fullContent === 'string');
+    expect(typeof fullContent).toBe('string');
   });
 
   test('streaming longer message', async () => {
@@ -121,7 +120,7 @@ describe('Streaming Vercel AI SDK Integration', () => {
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, longerMessage);
+    expect(fullContent).toBe(longerMessage);
   });
 
   test('streaming multiline content', async () => {
@@ -140,7 +139,7 @@ Final line`;
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, multilineMessage);
+    expect(fullContent).toBe(multilineMessage);
   });
 
   test('streaming special characters and unicode', async () => {
@@ -156,7 +155,7 @@ Final line`;
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, testMessage);
+    expect(fullContent).toBe(testMessage);
   });
 
   test('streaming multiple user messages (returns last)', async () => {
@@ -174,7 +173,7 @@ Final line`;
       fullContent += chunk;
     }
 
-    assert.strictEqual(fullContent, 'Last message');
+    expect(fullContent).toBe('Last message');
   });
 
   test('streaming system-only messages (returns default)', async () => {
@@ -191,6 +190,6 @@ Final line`;
     }
 
     // Should get the default echo model greeting
-    assert.ok(fullContent.includes('Echo model'), `Expected default response, got: ${fullContent}`);
+    expect(fullContent).toContain('Echo model');
   });
 });

@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText, streamText } from 'ai';
 
@@ -22,7 +21,7 @@ describe('Basic Vercel AI SDK Integration', () => {
       prompt: 'Hello World',
     });
 
-    assert.strictEqual(text, 'Hello World');
+    expect(text).toBe('Hello World');
   });
 
   test('generateText with messages', async () => {
@@ -35,7 +34,7 @@ describe('Basic Vercel AI SDK Integration', () => {
     });
 
     // Echo model should return the user message
-    assert.strictEqual(text, 'Test message');
+    expect(text).toBe('Test message');
   });
 
   test('generateText with multiple messages (returns last user message)', async () => {
@@ -48,7 +47,7 @@ describe('Basic Vercel AI SDK Integration', () => {
       ],
     });
 
-    assert.strictEqual(text, 'Last message');
+    expect(text).toBe('Last message');
   });
 
   test('generateText with system-only messages (returns default)', async () => {
@@ -60,7 +59,7 @@ describe('Basic Vercel AI SDK Integration', () => {
     });
 
     // Should get the default echo model greeting
-    assert.ok(text.includes('Echo model'), `Expected default response, got: ${text}`);
+    expect(text).toContain('Echo model');
   });
 
   test('response includes usage information', async () => {
@@ -69,12 +68,12 @@ describe('Basic Vercel AI SDK Integration', () => {
       prompt: 'Usage test',
     });
 
-    assert.strictEqual(result.text, 'Usage test');
-    assert.ok(result.usage);
-    assert.ok(typeof result.usage.promptTokens === 'number');
-    assert.ok(typeof result.usage.completionTokens === 'number');
-    assert.ok(typeof result.usage.totalTokens === 'number');
-    assert.ok(result.usage.totalTokens > 0);
+    expect(result.text).toBe('Usage test');
+    expect(result.usage).toBeTruthy();
+    expect(typeof result.usage.promptTokens).toBe('number');
+    expect(typeof result.usage.completionTokens).toBe('number');
+    expect(typeof result.usage.totalTokens).toBe('number');
+    expect(result.usage.totalTokens).toBeGreaterThan(0);
   });
 
   test('response includes finish reason', async () => {
@@ -83,8 +82,8 @@ describe('Basic Vercel AI SDK Integration', () => {
       prompt: 'Finish reason test',
     });
 
-    assert.strictEqual(result.text, 'Finish reason test');
-    assert.strictEqual(result.finishReason, 'stop');
+    expect(result.text).toBe('Finish reason test');
+    expect(result.finishReason).toBe('stop');
   });
 
   test('empty prompt handling', async () => {
@@ -94,7 +93,7 @@ describe('Basic Vercel AI SDK Integration', () => {
     });
 
     // Should handle empty input gracefully
-    assert.ok(typeof text === 'string');
+    expect(typeof text).toBe('string');
   });
 
   test('special characters and unicode', async () => {
@@ -105,7 +104,7 @@ describe('Basic Vercel AI SDK Integration', () => {
       prompt: testMessage,
     });
 
-    assert.strictEqual(text, testMessage);
+    expect(text).toBe(testMessage);
   });
 
   test('multiline content', async () => {
@@ -119,7 +118,7 @@ Final line`;
       prompt: multilineMessage,
     });
 
-    assert.strictEqual(text, multilineMessage);
+    expect(text).toBe(multilineMessage);
   });
 
   test('generateText with parameters', async () => {
@@ -131,6 +130,6 @@ Final line`;
       topP: 0.9,
     });
 
-    assert.strictEqual(text, 'Parameter test');
+    expect(text).toBe('Parameter test');
   });
 });

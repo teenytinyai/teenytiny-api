@@ -4,10 +4,14 @@
   "description": "Integration tests for TeenyTiny AI with Node.js OpenAI SDK",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.5"
   },
   "engines": {
     "node": ">=18"

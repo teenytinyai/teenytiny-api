@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert';
+import { test, describe, expect } from 'vitest';
 import OpenAI from 'openai';
 
 // Configuration
@@ -20,7 +19,7 @@ describe('Parameter Options', () => {
       temperature: 0.7,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Temperature test');
+    expect(completion.choices[0].message.content).toBe('Temperature test');
   });
 
   test('max_tokens parameter', async () => {
@@ -30,7 +29,7 @@ describe('Parameter Options', () => {
       max_tokens: 100,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Max tokens test');
+    expect(completion.choices[0].message.content).toBe('Max tokens test');
   });
 
   test('top_p parameter', async () => {
@@ -40,7 +39,7 @@ describe('Parameter Options', () => {
       top_p: 0.9,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Top P test');
+    expect(completion.choices[0].message.content).toBe('Top P test');
   });
 
   test('multiple parameters together', async () => {
@@ -52,7 +51,7 @@ describe('Parameter Options', () => {
       top_p: 0.95,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Multiple params test');
+    expect(completion.choices[0].message.content).toBe('Multiple params test');
   });
 
   test('streaming with parameters', async () => {
@@ -69,7 +68,7 @@ describe('Parameter Options', () => {
       fullContent += chunk.choices[0]?.delta?.content || '';
     }
 
-    assert.strictEqual(fullContent, 'Streaming with params');
+    expect(fullContent).toBe('Streaming with params');
   });
 
   test('n parameter (multiple choices)', async () => {
@@ -83,19 +82,19 @@ describe('Parameter Options', () => {
 
       // If supported, check we get multiple choices
       if (completion.choices.length > 1) {
-        assert.ok(completion.choices.length >= 2);
+        expect(completion.choices.length).toBeGreaterThanOrEqual(2);
         completion.choices.forEach((choice, i) => {
-          assert.ok(choice.message.content);
-          assert.strictEqual(choice.index, i);
+          expect(choice.message.content).toBeTruthy();
+          expect(choice.index).toBe(i);
         });
       } else {
         // If not supported, should still work with single choice
-        assert.strictEqual(completion.choices.length, 1);
-        assert.strictEqual(completion.choices[0].message.content, 'Multiple choices test');
+        expect(completion.choices.length).toBe(1);
+        expect(completion.choices[0].message.content).toBe('Multiple choices test');
       }
     } catch (error) {
       // Some services may reject the n parameter, which is also acceptable
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
     }
   });
 
@@ -107,7 +106,7 @@ describe('Parameter Options', () => {
     });
 
     // Echo model should still return the input regardless of penalty
-    assert.strictEqual(completion.choices[0].message.content, 'Presence penalty test');
+    expect(completion.choices[0].message.content).toBe('Presence penalty test');
   });
 
   test('frequency_penalty parameter', async () => {
@@ -117,7 +116,7 @@ describe('Parameter Options', () => {
       frequency_penalty: 0.3,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Frequency penalty test');
+    expect(completion.choices[0].message.content).toBe('Frequency penalty test');
   });
 
   test('stop parameter', async () => {
@@ -128,7 +127,7 @@ describe('Parameter Options', () => {
       stop: ['\n', '.'],
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Stop sequence test');
+    expect(completion.choices[0].message.content).toBe('Stop sequence test');
   });
 
   test('user parameter for tracking', async () => {
@@ -138,7 +137,7 @@ describe('Parameter Options', () => {
       user: 'test-user-123',
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'User tracking test');
+    expect(completion.choices[0].message.content).toBe('User tracking test');
   });
 
   test('seed parameter for deterministic responses', async () => {
@@ -156,8 +155,8 @@ describe('Parameter Options', () => {
     });
 
     // Both should return the same content (echo model behavior)
-    assert.strictEqual(completion1.choices[0].message.content, completion2.choices[0].message.content);
-    assert.strictEqual(completion1.choices[0].message.content, 'Seed test');
+    expect(completion1.choices[0].message.content).toBe(completion2.choices[0].message.content);
+    expect(completion1.choices[0].message.content).toBe('Seed test');
   });
 
   test('response_format parameter', async () => {
@@ -169,10 +168,10 @@ describe('Parameter Options', () => {
         response_format: { type: 'json_object' },
       });
 
-      assert.strictEqual(completion.choices[0].message.content, 'JSON format test');
+      expect(completion.choices[0].message.content).toBe('JSON format test');
     } catch (error) {
       // Some implementations may not support response_format, which is acceptable
-      assert.ok(error instanceof Error);
+      expect(error).toBeInstanceOf(Error);
     }
   });
 
@@ -186,6 +185,6 @@ describe('Parameter Options', () => {
       another_fake_param: 42,
     });
 
-    assert.strictEqual(completion.choices[0].message.content, 'Unknown params test');
+    expect(completion.choices[0].message.content).toBe('Unknown params test');
   });
 });
