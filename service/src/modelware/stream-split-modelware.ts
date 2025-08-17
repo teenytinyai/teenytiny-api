@@ -18,7 +18,7 @@ export class StreamSplitModelware implements Model {
         // Special handling for WORDS to match original EchoModel behavior
         const words = chunk.split(' ');
         for (let i = 0; i < words.length; i++) {
-          const word = words[i];
+          const word = words[i]!;
           const content = i === 0 ? word : ` ${word}`;
           yield content;
         }

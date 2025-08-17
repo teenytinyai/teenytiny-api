@@ -19,6 +19,29 @@ TeenyTiny AI is a drop-in replacement for OpenAI's chat completions API that can
 - 🛠️ **Developer Friendly**: Easy local development and testing
 - 🔒 **Self-hosted**: Keep your data under your control
 
+## Command Line Interface
+
+TeenyTiny AI includes a simple CLI client for testing and interacting with your API:
+
+```bash
+# Show available models and usage
+./tt
+
+# One-shot completion
+./tt echo "Hello, world!"
+
+# Interactive mode
+./tt echo
+```
+
+The CLI automatically connects to `http://localhost:8080` by default, or you can configure it with environment variables:
+
+```bash
+export TEENYTINY_URL=https://teenytiny.ai
+export TEENYTINY_API_KEY=your-api-key
+./tt echo "Hello from the cloud"
+```
+
 ---
 
 Built with ❤️ for the developer community. Questions? Open an issue on [GitHub](https://github.com/teenytinyai/teenytiny-api).

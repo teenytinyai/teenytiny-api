@@ -1,4 +1,4 @@
-import type { ErrorResponse } from './openai.js';
+import type { ErrorResponse } from './types.js';
 
 // Error types matching OpenAI's format
 export const ErrorTypes = {

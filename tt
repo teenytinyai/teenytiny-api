@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# TeenyTiny CLI wrapper
+# This script provides a convenient way to run the tt CLI from anywhere in the repo
+
+# Get the directory where this script is located (repo root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_DIR="${SCRIPT_DIR}/service"
+
+# Check if the service directory exists
+if [[ ! -d "$SERVICE_DIR" ]]; then
+    echo "Error: Service directory not found at $SERVICE_DIR"
+    exit 1
+fi
+
+# Change to service directory and run the CLI via npm (silently)
+cd "$SERVICE_DIR" && npm run cli --silent -- "$@"

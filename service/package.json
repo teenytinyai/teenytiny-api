@@ -4,13 +4,17 @@
   "description": "OpenAI-compatible chat completions API for Cloudflare Workers and Node.js",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "tt": "./dist/cli.js"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "vitest",
     "test:ci": "vitest run",
-    "cf:dev": "wrangler dev"
+    "cf:dev": "wrangler dev",
+    "cli": "tsx src/cli.ts"
   },
   "keywords": [
     "openai",
