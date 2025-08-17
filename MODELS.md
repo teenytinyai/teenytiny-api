@@ -104,3 +104,45 @@ PARRY's sophisticated emotional modeling and belief system maintenance made it g
 - Cerf, V. G. & Curran, J. (1972). "The ARPANET ELIZA-PARRY experiments". *RFC 439*. [https://tools.ietf.org/rfc/rfc439.txt](https://tools.ietf.org/rfc/rfc439.txt)
 - Sondheim, A. J. (1997). "Being On Line, Net Subjectivity". *Lusitania Press*. [Contains analysis of early AI personality simulations]
 - Boden, M. A. (2006). *Mind As Machine: A History of Cognitive Science*. Oxford University Press. [Chapter on early AI and PARRY]
+
+## RACTER Model
+
+*Surreal stream-of-consciousness text generator with dadaist poetic output.*
+
+### Origins
+
+RACTER (short for "raconteur") was created by William Chamberlain and Thomas Etter in the 1980s, representing one of the earliest experiments in computational creativity and generative literature. The program gained widespread attention for allegedly writing "The Policeman's Beard is Half Constructed" (1984), marketed as the first book written entirely by a computer.
+
+The project emerged during a period of growing interest in artificial creativity, when researchers began exploring whether computers could produce not just logical responses, but genuinely artistic and creative content. Unlike ELIZA's therapeutic focus or PARRY's psychological simulation, RACTER was designed purely for creative expression and literary experimentation.
+
+However, RACTER remains controversial in AI history. Scholars have questioned how much of the published output was truly computer-generated versus carefully curated and edited by humans from larger sets of computer-produced fragments. This controversy reflects broader questions about authorship, creativity, and the role of human intervention in computational art that persist in modern AI discussions.
+
+### How It Works
+
+RACTER implements a sophisticated template-based generation system combined with semantic word associations, creating one of the first successful attempts at computational poetry and abstract prose. The model operates through several creative mechanisms:
+
+**Template-Based Generation:** RACTER uses pre-written sentence structures with variable slots that can be filled with words from different semantic categories. Templates like "More than {material}, more than {material}, more than {material} I need {noun}" create the characteristic repetitive, incantatory style found in the published works.
+
+**Semantic Word Categories:** The system maintains extensive vocabularies organized by semantic and aesthetic properties - nouns, verbs, adjectives, emotions, materials, colors, and temporal expressions. These categories enable consistent thematic coherence while allowing for unexpected combinations that create surreal imagery.
+
+**Associative Word Chains:** RACTER builds semantic associations between concepts, allowing words to trigger related terms in subsequent generations. When "electricity" appears in one fragment, it might trigger "lightning," "power," or "circuit" in following text, creating loose thematic continuity through stream-of-consciousness flow.
+
+**Metaphorical Pattern Matching:** The system combines disparate semantic categories to create impossible but evocative imagery. Abstract concepts like "mathematics" combine with concrete objects like "butterfly" and sensory adjectives like "purple" to produce lines like "The butterfly dreams of purple mathematics."
+
+**Stream-of-Consciousness Flow:** Rather than generating single responses, RACTER often produces multiple connected fragments that drift between topics through associative logic. This creates the dreamlike, non-linear narrative style characteristic of surrealist and dadaist literature.
+
+**Randomized Selection with Weighted Preferences:** While maintaining randomness essential for creative surprise, RACTER weights certain word combinations and templates based on their aesthetic and poetic potential, ensuring that generated text maintains artistic coherence even while being logically nonsensical.
+
+**Poetic Rhythm and Repetition:** The system incorporates patterns of repetition, alliteration, and rhythmic structure that create musicality in the text, moving beyond pure randomness toward genuine poetic effect.
+
+RACTER's approach to computational creativity established important precedents for modern AI art and literature generation, demonstrating that machines could produce text valued for aesthetic rather than purely communicative purposes. The model's emphasis on surprise, beauty, and artistic effect over logical coherence represented a significant departure from other AI systems of its era and anticipated many themes in contemporary creative AI.
+
+### References
+
+- Chamberlain, W. & Etter, T. (1984). *The Policeman's Beard is Half Constructed*. Warner Books. ISBN: 0-446-38051-2
+- Chamberlain, W. & Etter, T. (1985). *The Racter Book*. Mindscape Inc.
+- "Racter". *Wikipedia*. [https://en.wikipedia.org/wiki/Racter](https://en.wikipedia.org/wiki/Racter)
+- Hartman, C. O. (1996). *Virtual Muse: Experiments in Computer Poetry*. University Press of New England. [Analysis of computer-generated poetry including RACTER]
+- Memmott, T. (2006). "Beyond Taxonomy: Digital Poetics and the Problem of Reading". In *New Media Poetics: Contexts, Technotexts, and Theories*. MIT Press.
+- Morris, A. & Swiss, T. (2006). "The New Media Poetics Reader". In *New Media Poetics*. MIT Press. [Contains analysis of early computational literature]
+- Funkhouser, C. T. (2007). *Prehistoric Digital Poetry: An Archaeology of Forms, 1959-1995*. University of Alabama Press. [Chapter on RACTER and early computer poetry]

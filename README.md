@@ -21,11 +21,12 @@ TeenyTiny AI is a drop-in replacement for OpenAI's chat completions API that can
 
 ## Available Models
 
-TeenyTiny AI includes three AI models accessible via the OpenAI-compatible API:
+TeenyTiny AI includes four AI models accessible via the OpenAI-compatible API:
 
 - **`echo`** - Simple text echoing for testing and debugging
 - **`eliza`** - Classic Rogerian psychotherapist simulation (MIT 1966)
 - **`parry`** - Paranoid patient simulation with emotional states (Stanford 1972)
+- **`racter`** - Surreal stream-of-consciousness text generator (1980s)
 
 For detailed information about each model's origins, algorithms, and behavior patterns, see **[MODELS.md](MODELS.md)**.
 

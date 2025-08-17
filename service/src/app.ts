@@ -14,6 +14,7 @@ import { OpenAIModelRegistry } from './openai-protocol/openai-model-registry.js'
 import { EchoModel } from './models/echo-model.js';
 import { ElizaModel } from './models/eliza-model.js';
 import { ParryModel } from './models/parry-model.js';
+import { RacterModel } from './models/racter-model.js';
 import { DelayModelware } from './modelware/delay-modelware.js';
 import { StreamSplitModelware } from './modelware/stream-split-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
@@ -45,9 +46,14 @@ export function createApp(config: AppConfig) {
   const streamSplitParry = new StreamSplitModelware(parryModel, StreamSplitModelware.WORDS);
   const delayedParryModel = new DelayModelware(streamSplitParry, 120);
   
+  const racterModel = new RacterModel();
+  const streamSplitRacter = new StreamSplitModelware(racterModel, StreamSplitModelware.WORDS);
+  const delayedRacterModel = new DelayModelware(streamSplitRacter, 80);
+  
   openaiRegistry.register('echo', delayedEchoModel);
   openaiRegistry.register('eliza', delayedElizaModel);
   openaiRegistry.register('parry', delayedParryModel);
+  openaiRegistry.register('racter', delayedRacterModel);
 
   // Middleware
   app.use('*', corsMiddleware());

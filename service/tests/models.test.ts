@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { EchoModel } from '../src/models/echo-model.js';
 import { ElizaModel } from '../src/models/eliza-model.js';
 import { ParryModel } from '../src/models/parry-model.js';
+import { RacterModel } from '../src/models/racter-model.js';
 import { DelayModelware } from '../src/modelware/delay-modelware.js';
 import { StreamSplitModelware } from '../src/modelware/stream-split-modelware.js';
 
@@ -352,6 +353,148 @@ describe('Simple Model Interface', () => {
       
       // Should mention themes at least once in 10 attempts
       expect(mentionedThemes).toBeGreaterThan(0);
+    });
+  });
+
+  describe('RacterModel', () => {
+    it('should generate surreal stream-of-consciousness text', async () => {
+      const model = new RacterModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('Tell me about dreams')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toBeTruthy();
+      expect(chunks[0].length).toBeGreaterThan(10);
+    });
+
+    it('should produce abstract and poetic language', async () => {
+      const model = new RacterModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('What is reality?')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      // Should contain abstract concepts typical of RACTER
+      const response = chunks[0].toLowerCase();
+      const hasAbstractLanguage = 
+        response.includes('more than') ||
+        response.includes('dream') ||
+        response.includes('electricity') ||
+        response.includes('butterfly') ||
+        response.includes('symphony') ||
+        response.includes('mathematics') ||
+        response.includes('purple') ||
+        response.includes('golden') ||
+        response.includes('whisper') ||
+        response.includes('shadow');
+        
+      expect(hasAbstractLanguage).toBe(true);
+    });
+
+    it('should generate different responses for same input', async () => {
+      const model = new RacterModel();
+      const responses: string[] = [];
+      
+      // Generate multiple responses to test randomness
+      for (let i = 0; i < 5; i++) {
+        const chunks: string[] = [];
+        for await (const chunk of model.process('Hello')) {
+          chunks.push(chunk);
+        }
+        responses.push(chunks[0]);
+      }
+      
+      // Should have at least some variation (not all identical)
+      const uniqueResponses = new Set(responses);
+      expect(uniqueResponses.size).toBeGreaterThan(1);
+    });
+
+    it('should handle empty input gracefully', async () => {
+      const model = new RacterModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0]).toBeTruthy();
+      expect(chunks[0].length).toBeGreaterThan(5);
+    });
+
+    it('should create metaphorical and surreal imagery', async () => {
+      const model = new RacterModel();
+      let foundMetaphoricalLanguage = false;
+      
+      // Test multiple generations to find metaphorical patterns
+      for (let i = 0; i < 10; i++) {
+        const chunks: string[] = [];
+        for await (const chunk of model.process('electricity')) {
+          chunks.push(chunk);
+        }
+        
+        const response = chunks[0].toLowerCase();
+        if (response.includes('dreams of') || 
+            response.includes('whispers') || 
+            response.includes('dances') ||
+            response.includes('while the') ||
+            response.includes('laughs at') ||
+            response.match(/\b\w+ and \w+ \w+ through \w+/)) {
+          foundMetaphoricalLanguage = true;
+          break;
+        }
+      }
+      
+      expect(foundMetaphoricalLanguage).toBe(true);
+    });
+
+    it('should produce responses with poetic structure', async () => {
+      const model = new RacterModel();
+      const chunks: string[] = [];
+      
+      for await (const chunk of model.process('poetry')) {
+        chunks.push(chunk);
+      }
+      
+      expect(chunks).toHaveLength(1);
+      const response = chunks[0];
+      
+      // Should have sentence-like structure with periods
+      expect(response).toMatch(/\./);
+      
+      // Should contain adjective + noun combinations typical of poetic language
+      expect(response).toMatch(/\b(purple|golden|silver|crimson|emerald|azure|electric|infinite|eternal|ancient|broken|perfect)\s+\w+/);
+    });
+
+    it('should use word associations when provided input concepts', async () => {
+      const model = new RacterModel();
+      let foundAssociation = false;
+      
+      // Test with a word that has known associations
+      for (let i = 0; i < 8; i++) {
+        const chunks: string[] = [];
+        for await (const chunk of model.process('butterfly')) {
+          chunks.push(chunk);
+        }
+        
+        const response = chunks[0].toLowerCase();
+        // Check for butterfly associations: wings, transformation, flower, flight, metamorphosis
+        if (response.includes('wing') || 
+            response.includes('transformation') || 
+            response.includes('flower') ||
+            response.includes('flight') ||
+            response.includes('metamorphosis')) {
+          foundAssociation = true;
+          break;
+        }
+      }
+      
+      expect(foundAssociation).toBe(true);
     });
   });
 });
