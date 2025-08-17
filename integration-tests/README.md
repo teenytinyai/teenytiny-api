@@ -14,6 +14,7 @@ Integration testing suite for TeenyTiny AI service compatibility with various cl
 | **[node-vercel-ai-v5](node-vercel-ai-v5/)** | JavaScript (Node.js) | [ai](https://v5.ai-sdk.dev/) (v5) |
 | **[java-openai](java-openai/)** | Java | [com.openai](https://github.com/openai/openai-java) |
 | **[java-spring-ai](java-spring-ai/)** | Java | [org.springframework.ai](https://docs.spring.io/spring-ai/reference/) |
+| **[go-openai](go-openai/)** | Go | [github.com/sashabaranov/go-openai](https://github.com/sashabaranov/go-openai) |
 
 ## Quick Start
 
