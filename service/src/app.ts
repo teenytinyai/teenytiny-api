@@ -84,6 +84,31 @@ export function createApp(config: AppConfig) {
       throw new InvalidRequestError('Missing required parameter: messages', 'messages');
     }
 
+    // Validate message structure
+    for (let i = 0; i < request.messages.length; i++) {
+      const message = request.messages[i];
+      
+      if (!message || typeof message !== 'object') {
+        throw new InvalidRequestError(`Invalid message at index ${i}: must be an object`, 'messages');
+      }
+      
+      if (!message.role) {
+        throw new InvalidRequestError(`Invalid message at index ${i}: missing required field 'role'`, 'messages');
+      }
+      
+      if (typeof message.role !== 'string' || !['system', 'user', 'assistant'].includes(message.role)) {
+        throw new InvalidRequestError(`Invalid message at index ${i}: 'role' must be one of 'system', 'user', or 'assistant'`, 'messages');
+      }
+      
+      if (message.content === undefined || message.content === null) {
+        throw new InvalidRequestError(`Invalid message at index ${i}: missing required field 'content'`, 'messages');
+      }
+      
+      if (typeof message.content !== 'string') {
+        throw new InvalidRequestError(`Invalid message at index ${i}: 'content' must be a string`, 'messages');
+      }
+    }
+
     // Get model
     const model = registry.get(request.model);
     if (!model) {

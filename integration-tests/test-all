@@ -1,0 +1,76 @@
+#!/bin/bash
+
+set -e
+
+# Change to the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Use environment variables or defaults
+export TEENYTINY_URL=${TEENYTINY_URL:-"http://localhost:8080"}
+export TEENYTINY_API_KEY=${TEENYTINY_API_KEY:-"testkey"}
+
+echo "Running TeenyTiny AI Integration Tests"
+echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
+echo
+
+# Find all test directories with executable test scripts
+test_dirs=()
+for dir in */; do
+    if [[ -f "$dir/test" && -x "$dir/test" ]]; then
+        test_dirs+=("$dir")
+    fi
+done
+
+if [[ ${#test_dirs[@]} -eq 0 ]]; then
+    echo "No test directories found with executable 'test' scripts"
+    exit 1
+fi
+
+echo "Found ${#test_dirs[@]} test suite(s): ${test_dirs[*]}"
+echo
+
+# Run tests in each directory
+passed=0
+failed=0
+failed_suites=()
+
+for dir in "${test_dirs[@]}"; do
+    suite_name="${dir%/}"  # Remove trailing slash
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Running $suite_name tests..."
+    echo
+    
+    if "./$dir/test" "$@"; then
+        echo
+        echo "✅ $suite_name: PASSED"
+        ((passed++))
+    else
+        echo
+        echo "❌ $suite_name: FAILED"
+        ((failed++))
+        failed_suites+=("$suite_name")
+    fi
+    echo
+done
+
+# Summary
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Integration Test Summary"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ Passed: $passed"
+echo "❌ Failed: $failed"
+
+if [[ $failed -gt 0 ]]; then
+    echo
+    echo "Failed suites:"
+    for suite in "${failed_suites[@]}"; do
+        echo "  - $suite"
+    done
+    echo
+    exit 1
+else
+    echo
+    echo "🎉 All integration tests passed!"
+    echo
+fi

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+# Change to the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Use environment variables or defaults
+export TEENYTINY_URL=${TEENYTINY_URL:-"http://localhost:8080"}
+export TEENYTINY_API_KEY=${TEENYTINY_API_KEY:-"testkey"}
+
+echo "Running Python OpenAI SDK integration tests..."
+echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
+
+# Install dependencies quietly
+pip install -q -r requirements.txt
+
+pytest --tb=short --no-header "$@"

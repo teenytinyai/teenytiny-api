@@ -4,7 +4,7 @@ import { serve } from '@hono/node-server';
 import { createApp } from './app.js';
 
 const DEFAULT_PORT = 8080;
-const DEFAULT_API_KEY = 'tt-1234567890abcdef';
+const DEFAULT_API_KEY = 'testkey';
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -62,7 +62,7 @@ function showHelp() {
   console.log('');
   console.log('Options:');
   console.log('  --port, -p <port>     Port to run the server on (default: 8080)');
-  console.log('  --api-key <key>       API key for authentication (default: tt-1234567890abcdef)');
+  console.log('  --api-key <key>       API key for authentication (default: testkey)');
   console.log('  --help, -h            Show this help message');
   console.log('');
   console.log('Examples:');
