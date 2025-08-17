@@ -1,0 +1,5 @@
+description: "Program E AIML collection"
+license: "GPL"
+url: "https://github.com/Orbiter/AIML_Archive/tree/master/aiml/en/Program_E"
+files:
+  - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/Program_E/std-65percent.aiml"
