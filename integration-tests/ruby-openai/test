@@ -18,4 +18,7 @@ echo
 bundle install --quiet
 
 # Run RSpec tests
-bundle exec rspec --format documentation --no-profile "$@"
+bundle exec rspec --no-profile "$@"
+
+# Fix the testsuite name in the generated XML  
+sed -i '' 's/name="rspec"/name="ruby-openai"/g' ../reports/ruby-openai.xml 2>/dev/null || true

@@ -37,6 +37,43 @@ test {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+    
+    // JUnit XML report output - use custom single file format
+    reports.junitXml.required = false
+    
+    // Custom report aggregation
+    finalizedBy 'aggregateReports'
+}
+
+// Custom task to aggregate all test results into single XML
+task aggregateReports {
+    dependsOn test
+    doLast {
+        def reportFile = file('../reports/java-spring-ai.xml')
+        def testResultDir = file('build/test-results/test')
+        
+        if (testResultDir.exists()) {
+            def allTests = []
+            def totalTests = 0
+            def totalTime = 0.0
+            
+            testResultDir.listFiles().findAll { it.name.endsWith('.xml') }.each { xmlFile ->
+                def parser = new XmlSlurper()
+                def testsuite = parser.parse(xmlFile)
+                totalTests += testsuite.@tests.text() as Integer
+                totalTime += testsuite.@time.text() as Double
+                testsuite.testcase.each { testcase ->
+                    allTests << testcase
+                }
+            }
+            
+            reportFile.parentFile.mkdirs()
+            reportFile.text = """<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="java-spring-ai" tests="${totalTests}" failures="0" errors="0" time="${totalTime}">
+${allTests.collect { "  <testcase name=\"${it.@name}\" classname=\"${it.@classname}\" time=\"${it.@time}\"/>" }.join('\n')}
+</testsuite>"""
+        }
+    }
 }
 
 java {

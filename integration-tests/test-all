@@ -10,6 +10,11 @@ cd "$SCRIPT_DIR"
 export TEENYTINY_URL=${TEENYTINY_URL:-"http://localhost:8080"}
 export TEENYTINY_API_KEY=${TEENYTINY_API_KEY:-"testkey"}
 
+# Clean up old reports
+echo "Cleaning up previous test reports..."
+rm -rf reports
+mkdir -p reports
+
 echo "Running TeenyTiny AI Integration Tests"
 echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
 echo
@@ -36,11 +41,11 @@ failed=0
 failed_suites=()
 
 for dir in "${test_dirs[@]}"; do
-    suite_name="${dir%/}"  # Remove trailing slash
+    suite_name="${dir%/}" # Remove trailing slash
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Running $suite_name tests..."
     echo
-    
+
     if "./$dir/test" "$@"; then
         echo
         echo "✅ $suite_name: PASSED"
@@ -61,9 +66,19 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "✅ Passed: $passed"
 echo "❌ Failed: $failed"
 
+# Generate xunit-viewer HTML report
+echo "Generating xunit-viewer HTML report..."
+
+# Generate report using xunit-viewer with console output (both console and file)
+npx -y xunit-viewer -r reports -o reports/index.html --console | tee reports/report.txt
+
+echo "✅ Test report generated at: $SCRIPT_DIR/reports/index.html"
+echo "✅ Console report saved to: $SCRIPT_DIR/reports/report.txt"
+echo
+
 if [[ $failed -gt 0 ]]; then
     echo
-    echo "Failed suites:"
+    echo "❌ Failed suites:"
     for suite in "${failed_suites[@]}"; do
         echo "  - $suite"
     done

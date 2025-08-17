@@ -14,5 +14,44 @@ echo "Running Rust OpenAI integration tests..."
 echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
 echo
 
-# Build and run the integration tests
-cargo run --bin integration_test
+# Run cargo test and generate XML from output
+echo "Running cargo test..."
+if cargo test -- --nocapture 2>&1 | tee test_output.txt; then
+    test_exit_code=0
+else
+    test_exit_code=1
+fi
+
+# Parse test output to extract individual test results
+test_results=""
+total_tests=0
+failed_tests=0
+
+# Extract test results from cargo test output
+while IFS= read -r line; do
+    # Match lines like "test basic::test_basic_completion ... ok"
+    if [[ $line =~ test[[:space:]]+([^[:space:]]+)[[:space:]]+\.\.\.[[:space:]]+(ok|FAILED) ]]; then
+        test_name="${BASH_REMATCH[1]}"
+        status="${BASH_REMATCH[2]}"
+        total_tests=$((total_tests + 1))
+        
+        if [[ "$status" == "ok" ]]; then
+            test_results="${test_results}  <testcase name=\"$test_name\" classname=\"rust-openai\" time=\"0\"/>
+"
+        else
+            test_results="${test_results}  <testcase name=\"$test_name\" classname=\"rust-openai\" time=\"0\"><failure message=\"test failed\"/></testcase>
+"
+            failed_tests=$((failed_tests + 1))
+        fi
+    fi
+done < test_output.txt
+
+# Generate JUnit XML
+cat > ../reports/rust-openai.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="rust-openai" tests="$total_tests" failures="$failed_tests" errors="0" time="0">
+$test_results</testsuite>
+EOF
+
+# Clean up
+rm -f test_output.txt

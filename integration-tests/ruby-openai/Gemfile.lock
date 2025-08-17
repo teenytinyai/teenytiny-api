@@ -26,6 +26,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.4)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     ruby-openai (6.5.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
@@ -38,6 +40,7 @@ PLATFORMS
 DEPENDENCIES
   dotenv (~> 2.8)
   rspec (~> 3.12)
+  rspec_junit_formatter
   ruby-openai (~> 6.3)
 
 RUBY VERSION

@@ -1,3 +1,51 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 npm test
+
+# Post-process XML to flatten testsuite structure
+if [ -f "../reports/node-vercel-ai-v4.xml" ]; then
+    python3 -c "
+import xml.etree.ElementTree as ET
+import sys
+
+try:
+    tree = ET.parse('../reports/node-vercel-ai-v4.xml')
+    root = tree.getroot()
+    
+    # Collect all testcase elements
+    testcases = []
+    total_tests = 0
+    total_failures = 0
+    total_time = 0.0
+    
+    for testsuite in root.findall('testsuite'):
+        total_tests += int(testsuite.get('tests', 0))
+        total_failures += int(testsuite.get('failures', 0))
+        total_time += float(testsuite.get('time', 0))
+        
+        for testcase in testsuite.findall('testcase'):
+            # Update classname to suite name
+            testcase.set('classname', 'node-vercel-ai-v4')
+            testcases.append(testcase)
+    
+    # Create new root with single testsuite
+    new_root = ET.Element('testsuite')
+    new_root.set('name', 'node-vercel-ai-v4')
+    new_root.set('tests', str(total_tests))
+    new_root.set('failures', str(total_failures))
+    new_root.set('errors', '0')
+    new_root.set('time', str(total_time))
+    
+    # Add all testcases to new root
+    for testcase in testcases:
+        new_root.append(testcase)
+    
+    # Write flattened XML
+    new_tree = ET.ElementTree(new_root)
+    new_tree.write('../reports/node-vercel-ai-v4.xml', xml_declaration=True, encoding='UTF-8')
+    print('Flattened node-vercel-ai-v4.xml successfully')
+    
+except Exception as e:
+    print(f'Error processing XML: {e}', file=sys.stderr)
+"
+fi

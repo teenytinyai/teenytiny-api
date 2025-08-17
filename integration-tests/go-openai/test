@@ -16,4 +16,17 @@ echo
 
 # Download dependencies and run tests
 go mod download
-go test -v ./... "$@"
+
+# Install go-junit-report if not available
+if ! command -v go-junit-report &> /dev/null; then
+    echo "Installing go-junit-report..."
+    go install github.com/jstemmer/go-junit-report/v2@latest
+    # Add Go bin to PATH if not already there
+    export PATH=$PATH:$(go env GOPATH)/bin
+fi
+
+go test -v ./... "$@" | go-junit-report -set-exit-code > ../reports/go-openai.xml.tmp
+
+# Fix the testsuite name in the generated XML
+sed 's/name="teenytiny-go-openai-integration"/name="go-openai"/g' ../reports/go-openai.xml.tmp > ../reports/go-openai.xml
+rm ../reports/go-openai.xml.tmp

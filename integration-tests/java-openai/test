@@ -20,5 +20,5 @@ if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
     gradle wrapper >/dev/null 2>&1
 fi
 
-# Run Gradle tests
-./gradlew test --no-daemon --rerun-tasks "$@"
+# Run Gradle tests and generate reports
+./gradlew aggregateReports --no-daemon --rerun-tasks "$@"

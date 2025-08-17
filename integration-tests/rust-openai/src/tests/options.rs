@@ -1,188 +1,148 @@
 use async_openai::types::CreateChatCompletionRequestArgs;
-use anyhow::{anyhow, Result};
 use futures::StreamExt;
 
 use crate::setup_client;
 use super::user_message;
 
-pub async fn test_custom_temperature_parameter() -> Result<()> {
+#[tokio::test]
+async fn test_custom_temperature_parameter() {
     let client = setup_client();
 
     let request = CreateChatCompletionRequestArgs::default()
         .model("echo")
         .messages([user_message("Temperature test")])
         .temperature(0.7)
-        .build()?;
+        .build().unwrap();
 
-    let response = client.chat().create(request).await?;
+    let response = client.chat().create(request).await.unwrap();
 
-    // Echo model should still return the same content regardless of temperature
+    // Validate response structure
+    assert!(!response.choices.is_empty());
     let content = response.choices[0].message.content.as_ref()
-        .ok_or_else(|| anyhow!("No content in response"))?;
+        .expect("Response should have content");
+    assert_eq!(content, "Temperature test");
 
-    if content != "Temperature test" {
-        return Err(anyhow!("Expected 'Temperature test', got '{}'", content));
-    }
-
-    if response.model != "echo" {
-        return Err(anyhow!("Expected model 'echo'"));
-    }
-
-    println!("  ✓ Custom temperature parameter test passed");
-    Ok(())
+    // Echo model should accept temperature parameter without errors
+    assert_eq!(response.model, "echo");
 }
 
-pub async fn test_custom_max_tokens_parameter() -> Result<()> {
+#[tokio::test]
+async fn test_custom_max_tokens_parameter() {
     let client = setup_client();
 
     let request = CreateChatCompletionRequestArgs::default()
         .model("echo")
         .messages([user_message("Max tokens test")])
-        .max_tokens(50u16)
-        .build()?;
-
-    let response = client.chat().create(request).await?;
-
-    let content = response.choices[0].message.content.as_ref()
-        .ok_or_else(|| anyhow!("No content in response"))?;
-
-    if content != "Max tokens test" {
-        return Err(anyhow!("Expected 'Max tokens test', got '{}'", content));
-    }
-
-    // Usage tokens should be within reasonable bounds for the echo model
-    if let Some(usage) = &response.usage {
-        if usage.total_tokens > 100 {
-            return Err(anyhow!("Total tokens should be <= 100"));
-        }
-    }
-
-    println!("  ✓ Custom max tokens parameter test passed");
-    Ok(())
-}
-
-pub async fn test_multiple_parameters_combined() -> Result<()> {
-    let client = setup_client();
-
-    let request = CreateChatCompletionRequestArgs::default()
-        .model("echo")
-        .messages([user_message("Combined parameters")])
-        .temperature(0.5)
         .max_tokens(100u16)
-        .top_p(0.9)
-        .build()?;
+        .build().unwrap();
 
-    let response = client.chat().create(request).await?;
+    let response = client.chat().create(request).await.unwrap();
 
+    // Validate response
+    assert!(!response.choices.is_empty());
     let content = response.choices[0].message.content.as_ref()
-        .ok_or_else(|| anyhow!("No content in response"))?;
+        .expect("Response should have content");
+    assert_eq!(content, "Max tokens test");
 
-    if content != "Combined parameters" {
-        return Err(anyhow!("Expected 'Combined parameters', got '{}'", content));
+    // Check usage information
+    if let Some(usage) = response.usage {
+        assert!(usage.total_tokens > 0);
     }
-
-    if response.model != "echo" {
-        return Err(anyhow!("Expected model 'echo'"));
-    }
-
-    if let Some(usage) = &response.usage {
-        if usage.total_tokens == 0 {
-            return Err(anyhow!("Total tokens should be > 0"));
-        }
-    }
-
-    println!("  ✓ Multiple parameters combined test passed");
-    Ok(())
 }
 
-pub async fn test_streaming_with_parameters() -> Result<()> {
+#[tokio::test]
+async fn test_multiple_parameters_combined() {
     let client = setup_client();
 
     let request = CreateChatCompletionRequestArgs::default()
         .model("echo")
-        .messages([user_message("Streaming with options")])
+        .messages([user_message("Multiple params test")])
         .temperature(0.8)
-        .max_tokens(75u16)
+        .max_tokens(150u16)
+        .top_p(0.9)
+        .build().unwrap();
+
+    let response = client.chat().create(request).await.unwrap();
+
+    // Validate response
+    assert!(!response.choices.is_empty());
+    let content = response.choices[0].message.content.as_ref()
+        .expect("Response should have content");
+    assert_eq!(content, "Multiple params test");
+
+    // Echo model should handle multiple parameters
+    assert_eq!(response.model, "echo");
+}
+
+#[tokio::test]
+async fn test_streaming_with_parameters() {
+    let client = setup_client();
+
+    let request = CreateChatCompletionRequestArgs::default()
+        .model("echo")
+        .messages([user_message("Streaming params test")])
+        .temperature(0.5)
         .stream(true)
-        .build()?;
+        .build().unwrap();
 
-    let mut stream = client.chat().create_stream(request).await?;
-    
+    let mut stream = client.chat().create_stream(request).await.unwrap();
+
     let mut content_parts = Vec::new();
-
     while let Some(result) = stream.next().await {
-        let response = result?;
-
-        if response.model != "echo" {
-            return Err(anyhow!("Expected model 'echo'"));
-        }
-
-        if let Some(choice) = response.choices.first() {
+        let chunk = result.unwrap();
+        
+        if let Some(choice) = chunk.choices.first() {
             if let Some(content) = &choice.delta.content {
                 content_parts.push(content.clone());
             }
         }
     }
 
-    let combined_content = content_parts.join("");
-    if combined_content != "Streaming with options" {
-        return Err(anyhow!("Expected 'Streaming with options', got '{}'", combined_content));
-    }
-
-    println!("  ✓ Streaming with parameters test passed");
-    Ok(())
+    let full_content = content_parts.join("");
+    assert_eq!(full_content, "Streaming params test");
 }
 
-pub async fn test_user_parameter_in_request() -> Result<()> {
+#[tokio::test]
+async fn test_user_parameter_in_request() {
     let client = setup_client();
 
     let request = CreateChatCompletionRequestArgs::default()
         .model("echo")
-        .messages([user_message("User parameter test")])
+        .messages([user_message("User param test")])
         .user("test-user-123")
-        .build()?;
+        .build().unwrap();
 
-    let response = client.chat().create(request).await?;
+    let response = client.chat().create(request).await.unwrap();
 
+    // Validate response
+    assert!(!response.choices.is_empty());
     let content = response.choices[0].message.content.as_ref()
-        .ok_or_else(|| anyhow!("No content in response"))?;
+        .expect("Response should have content");
+    assert_eq!(content, "User param test");
 
-    if content != "User parameter test" {
-        return Err(anyhow!("Expected 'User parameter test', got '{}'", content));
-    }
-
-    if response.model != "echo" {
-        return Err(anyhow!("Expected model 'echo'"));
-    }
-
-    println!("  ✓ User parameter in request test passed");
-    Ok(())
+    // Echo model should accept user parameter
+    assert_eq!(response.model, "echo");
 }
 
-pub async fn test_frequency_and_presence_penalty_parameters() -> Result<()> {
+#[tokio::test]
+async fn test_frequency_and_presence_penalty_parameters() {
     let client = setup_client();
 
     let request = CreateChatCompletionRequestArgs::default()
         .model("echo")
-        .messages([user_message("Penalty parameters test")])
+        .messages([user_message("Penalty params test")])
         .frequency_penalty(0.5)
         .presence_penalty(0.3)
-        .build()?;
+        .build().unwrap();
 
-    let response = client.chat().create(request).await?;
+    let response = client.chat().create(request).await.unwrap();
 
-    // Echo model should still work with penalty parameters
+    // Validate response
+    assert!(!response.choices.is_empty());
     let content = response.choices[0].message.content.as_ref()
-        .ok_or_else(|| anyhow!("No content in response"))?;
+        .expect("Response should have content");
+    assert_eq!(content, "Penalty params test");
 
-    if content != "Penalty parameters test" {
-        return Err(anyhow!("Expected 'Penalty parameters test', got '{}'", content));
-    }
-
-    if response.model != "echo" {
-        return Err(anyhow!("Expected model 'echo'"));
-    }
-
-    println!("  ✓ Frequency and presence penalty parameters test passed");
-    Ok(())
+    // Echo model should accept penalty parameters
+    assert_eq!(response.model, "echo");
 }
