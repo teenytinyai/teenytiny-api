@@ -19,6 +19,16 @@ TeenyTiny AI is a drop-in replacement for OpenAI's chat completions API that can
 - 🛠️ **Developer Friendly**: Easy local development and testing
 - 🔒 **Self-hosted**: Keep your data under your control
 
+## Available Models
+
+TeenyTiny AI includes three AI models accessible via the OpenAI-compatible API:
+
+- **`echo`** - Simple text echoing for testing and debugging
+- **`eliza`** - Classic Rogerian psychotherapist simulation (MIT 1966)
+- **`parry`** - Paranoid patient simulation with emotional states (Stanford 1972)
+
+For detailed information about each model's origins, algorithms, and behavior patterns, see **[MODELS.md](MODELS.md)**.
+
 ## Command Line Interface
 
 TeenyTiny AI includes a simple CLI client for testing and interacting with your API:
