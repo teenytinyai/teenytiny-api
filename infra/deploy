@@ -1,0 +1,206 @@
+#!/bin/bash
+
+# TeenyTiny AI - Infrastructure-as-Code Deployment Script
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+INFRA_DIR="$SCRIPT_DIR"
+
+# Check if environment is provided
+if [ -z "$1" ]; then
+    echo -e "${RED}❌ Usage: deploy [environment]${NC}"
+    echo "Available environments:"
+    yq eval '.environments | keys | .[]' "$INFRA_DIR/environments.yaml" 2>/dev/null || echo "  (install yq to see available environments)"
+    exit 1
+fi
+
+ENVIRONMENT="$1"
+
+echo -e "${CYAN}🚀 TeenyTiny AI Deployment${NC}"
+echo -e "${CYAN}Environment: ${YELLOW}$ENVIRONMENT${NC}"
+echo "================================"
+
+# Check if yq is installed
+if ! command -v yq &> /dev/null; then
+    echo -e "${RED}❌ yq is required but not installed${NC}"
+    echo "Install with: brew install yq"
+    exit 1
+fi
+
+# Check if terraform is installed  
+if ! command -v terraform &> /dev/null; then
+    echo -e "${RED}❌ terraform is required but not installed${NC}"
+    echo "Install with: brew install terraform"
+    exit 1
+fi
+
+# Load environment configuration
+ENV_CONFIG="$INFRA_DIR/environments.yaml"
+if [ ! -f "$ENV_CONFIG" ]; then
+    echo -e "${RED}❌ Environment config not found: $ENV_CONFIG${NC}"
+    exit 1
+fi
+
+# Extract environment variables using yq
+DOMAIN=$(yq eval ".environments.$ENVIRONMENT.domain" "$ENV_CONFIG")
+WORKER_NAME=$(yq eval ".environments.$ENVIRONMENT.worker_name" "$ENV_CONFIG")
+ZONE_NAME=$(yq eval ".environments.$ENVIRONMENT.zone_name" "$ENV_CONFIG")
+CLOUDFLARE_ACCOUNT_ID=$(yq eval ".environments.$ENVIRONMENT.cloudflare_account_id" "$ENV_CONFIG")
+
+# Check if environment exists
+if [ "$DOMAIN" = "null" ]; then
+    echo -e "${RED}❌ Environment '$ENVIRONMENT' not found in $ENV_CONFIG${NC}"
+    echo "Available environments:"
+    yq eval '.environments | keys | .[]' "$ENV_CONFIG"
+    exit 1
+fi
+
+echo -e "${BLUE}📋 Configuration:${NC}"
+echo "  Domain: $DOMAIN"
+echo "  Worker: $WORKER_NAME"
+echo "  Zone: $ZONE_NAME"
+echo "  Account: $CLOUDFLARE_ACCOUNT_ID"
+echo ""
+
+# Load .env file
+if [ ! -f "$INFRA_DIR/.env" ]; then
+    echo -e "${RED}❌ .env file not found${NC}"
+    echo "Create .env file: cp infra/.env.example infra/.env"
+    echo "Then edit infra/.env with your Cloudflare API token"
+    exit 1
+fi
+
+source "$INFRA_DIR/.env"
+
+# Export environment variables for Terraform
+export CLOUDFLARE_API_TOKEN
+export CLOUDFLARE_ACCOUNT_ID
+
+# Export R2 credentials as AWS-compatible env vars for Terraform S3 backend
+export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
+
+# Check for required environment variables
+if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+    echo -e "${RED}❌ CLOUDFLARE_API_TOKEN not set in .env file${NC}"
+    echo "Edit infra/.env and add: CLOUDFLARE_API_TOKEN=your-token"
+    exit 1
+fi
+
+# Check R2 credentials
+if [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_SECRET_ACCESS_KEY" ]; then
+    echo -e "${RED}❌ R2 credentials not set in .env file${NC}"
+    echo "Add R2 credentials to infra/.env:"
+    echo "  R2_ACCESS_KEY_ID=your-r2-access-key-id"
+    echo "  R2_SECRET_ACCESS_KEY=your-r2-secret-access-key"
+    echo "Get them from: Cloudflare Dashboard → R2 → Manage R2 API Tokens"
+    exit 1
+fi
+
+# Check if account ID is configured properly
+if [ "$CLOUDFLARE_ACCOUNT_ID" = "null" ] || [ "$CLOUDFLARE_ACCOUNT_ID" = "your-account-id-here" ]; then
+    echo -e "${RED}❌ cloudflare_account_id not configured for environment '$ENVIRONMENT'${NC}"
+    echo "Please update $ENV_CONFIG with your actual Cloudflare Account ID"
+    echo "Find your account ID at: https://dash.cloudflare.com (right sidebar)"
+    exit 1
+fi
+
+# Step 1: Build the application
+echo -e "${BLUE}🔨 Building application...${NC}"
+cd "$PROJECT_ROOT"
+npm run build
+
+# Check if build output exists
+if [ ! -f "$PROJECT_ROOT/dist/index.js" ]; then
+    echo -e "${RED}❌ Build failed - dist/index.js not found${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Build completed${NC}"
+
+# Step 2: Initialize Terraform with R2 backend
+cd "$INFRA_DIR/terraform"
+echo -e "${BLUE}🔧 Initializing Terraform with R2 backend for $ENVIRONMENT...${NC}"
+
+# Initialize with environment-specific state key
+terraform init \
+    -backend-config="key=env/$ENVIRONMENT/terraform.tfstate" \
+    -reconfigure
+
+# Note: With remote state, workspaces are no longer needed for environment isolation
+# Each environment gets its own state file in R2: env/prod/, env/qa/, etc.
+
+# Step 3: Plan Terraform changes
+echo -e "${BLUE}📋 Planning infrastructure changes...${NC}"
+terraform plan \
+    -var="environment=$ENVIRONMENT" \
+    -var="domain=$DOMAIN" \
+    -var="worker_name=$WORKER_NAME" \
+    -var="zone_name=$ZONE_NAME" \
+    -var="cloudflare_account_id=$CLOUDFLARE_ACCOUNT_ID" \
+    -out="$ENVIRONMENT.tfplan"
+
+# Step 4: Apply Terraform changes (DNS + routes)
+echo -e "${BLUE}🚀 Applying infrastructure changes...${NC}"
+terraform apply "$ENVIRONMENT.tfplan"
+
+# Clean up plan file
+rm -f "$ENVIRONMENT.tfplan"
+
+# Step 5: Deploy Worker code with Wrangler
+echo -e "${BLUE}📦 Deploying Worker code...${NC}"
+cd "$PROJECT_ROOT"
+
+# Deploy with configuration from environments.yaml (no wrangler env blocks needed)
+npx wrangler deploy \
+    --name "$WORKER_NAME" \
+    --route "$DOMAIN/*" \
+    --compatibility-date "2024-11-01" \
+    --env=""
+
+# Step 6: Get deployment outputs
+cd "$INFRA_DIR/terraform"
+WORKER_URL=$(terraform output -raw worker_url)
+HEALTH_URL=$(terraform output -raw health_check_url)
+
+echo ""
+echo -e "${GREEN}🎉 Deployment completed successfully!${NC}"
+echo ""
+echo -e "${CYAN}📍 Deployment Details:${NC}"
+echo -e "  Environment: ${YELLOW}$ENVIRONMENT${NC}"
+echo -e "  Worker URL:  ${GREEN}$WORKER_URL${NC}"
+echo -e "  Health URL:  ${GREEN}$HEALTH_URL${NC}"
+echo ""
+
+# Step 7: Wait a moment for DNS propagation and test
+echo -e "${BLUE}🧪 Testing deployment...${NC}"
+sleep 5
+
+if curl -f -s "$HEALTH_URL" > /dev/null; then
+    echo -e "${GREEN}✅ Health check passed!${NC}"
+    
+    # Test the actual response
+    RESPONSE=$(curl -s "$HEALTH_URL")
+    echo "Response: $RESPONSE"
+else
+    echo -e "${YELLOW}⚠️  Health check failed - this might be due to DNS propagation delay${NC}"
+    echo "Try again in a few minutes: curl $HEALTH_URL"
+fi
+
+echo ""
+echo -e "${CYAN}🎯 Next Steps:${NC}"
+echo "• Test your API: curl $HEALTH_URL"
+echo "• Check health: $(basename "$0" .sh) check $ENVIRONMENT"
+echo "• View logs: wrangler tail --env $ENVIRONMENT"
+echo ""
+echo -e "${GREEN}🚀 $ENVIRONMENT environment is ready!${NC}"

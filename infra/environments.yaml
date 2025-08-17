@@ -1,0 +1,17 @@
+# TeenyTiny AI Environment Configuration
+
+environments:
+  prod:
+    domain: "teenytiny.ai"
+    description: "Production environment"
+    cloudflare_account_id: "74200eae33313459882c57f6ae0fbe2e"
+    zone_name: "teenytiny.ai"
+    worker_name: "teenytiny-api"
+
+  qa:
+    domain: "qa.teenytiny.ai"
+    description: "QA/staging environment"
+    cloudflare_account_id: "74200eae33313459882c57f6ae0fbe2e"
+    zone_name: "teenytiny.ai"
+    worker_name: "teenytiny-api-qa"
+

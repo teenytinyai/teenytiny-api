@@ -10,7 +10,6 @@
     "start": "node dist/server.js",
     "test": "vitest",
     "test:ci": "vitest run",
-    "deploy": "wrangler deploy",
     "cf:dev": "wrangler dev"
   },
   "keywords": [
@@ -26,10 +25,11 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241106.0",
     "@types/node": "^22.9.0",
+    "esbuild": "^0.25.9",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^2.1.5",
-    "wrangler": "^3.87.0"
+    "wrangler": "^4.30.0"
   },
   "dependencies": {
     "@hono/node-server": "^1.18.2",

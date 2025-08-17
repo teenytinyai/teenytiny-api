@@ -157,29 +157,38 @@ For production deployments, you can use environment variables:
 
 ### Cloudflare Workers Deployment
 
-1. **Install Wrangler:**
-   ```bash
-   npm install -g wrangler
+1. **Configure your environments:**
+   Edit `infra/environments.yaml` and update the `cloudflare_account_id` for each environment:
+   ```yaml
+   environments:
+     prod:
+       cloudflare_account_id: "your-actual-account-id"
+     qa:
+       cloudflare_account_id: "your-actual-account-id"
    ```
 
-2. **Configure your API key:**
+2. **Set up your API token:**
    ```bash
-   wrangler secret put API_KEY
-   # Enter your API key when prompted
+   cp infra/.env.example infra/.env
+   # Edit infra/.env and add your actual API token
    ```
 
-3. **Deploy:**
+3. **Deploy to production:**
    ```bash
-   npm run deploy
+   infra/deploy prod
    ```
 
-4. **Test your deployment:**
+4. **Deploy to QA:**
    ```bash
-   curl -X POST https://your-worker.your-domain.workers.dev/v1/chat/completions \
-     -H 'Authorization: Bearer your-api-key' \
-     -H 'Content-Type: application/json' \
-     -d '{"model": "echo", "messages": [{"role": "user", "content": "Hello!"}]}'
+   infra/deploy qa
    ```
+
+5. **Check health:**
+   ```bash
+   infra/check prod
+   ```
+
+The deployment uses Infrastructure-as-Code (Terraform) to automatically set up DNS, Workers, and routes.
 
 ## Developer Guide
 
@@ -253,12 +262,16 @@ npm run test:ci -- --coverage
 
 ### Development Scripts
 
+**Core scripts:**
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
 - `npm start` - Run production server
 - `npm test` - Run tests in watch mode
-- `npm run deploy` - Deploy to Cloudflare Workers
 - `npm run cf:dev` - Run in Cloudflare Workers development mode
+
+**Infrastructure-as-Code:**
+- `infra/deploy [env]` - Deploy code and infrastructure to environment
+- `infra/check [env]` - Run health checks on environment
 
 ### Contributing
 

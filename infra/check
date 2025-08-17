@@ -1,0 +1,158 @@
+#!/bin/bash
+
+# TeenyTiny AI - Environment Health Check Script
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+INFRA_DIR="$SCRIPT_DIR"
+
+# Check if environment is provided
+if [ -z "$1" ]; then
+    echo -e "${RED}❌ Usage: check [environment]${NC}"
+    echo "Available environments:"
+    yq eval '.environments | keys | .[]' "$INFRA_DIR/environments.yaml" 2>/dev/null || echo "  (install yq to see available environments)"
+    exit 1
+fi
+
+ENVIRONMENT="$1"
+
+echo -e "${CYAN}🔍 TeenyTiny AI Health Check${NC}"
+echo -e "${CYAN}Environment: ${YELLOW}$ENVIRONMENT${NC}"
+echo "================================"
+
+# Check if yq is installed
+if ! command -v yq &> /dev/null; then
+    echo -e "${RED}❌ yq is required but not installed${NC}"
+    echo "Install with: brew install yq"
+    exit 1
+fi
+
+# Load environment configuration
+ENV_CONFIG="$INFRA_DIR/environments.yaml"
+if [ ! -f "$ENV_CONFIG" ]; then
+    echo -e "${RED}❌ Environment config not found: $ENV_CONFIG${NC}"
+    exit 1
+fi
+
+# Extract environment variables using yq
+DOMAIN=$(yq eval ".environments.$ENVIRONMENT.domain" "$ENV_CONFIG")
+WORKER_NAME=$(yq eval ".environments.$ENVIRONMENT.worker_name" "$ENV_CONFIG")
+
+# Check if environment exists
+if [ "$DOMAIN" = "null" ]; then
+    echo -e "${RED}❌ Environment '$ENVIRONMENT' not found in $ENV_CONFIG${NC}"
+    echo "Available environments:"
+    yq eval '.environments | keys | .[]' "$ENV_CONFIG"
+    exit 1
+fi
+
+BASE_URL="https://$DOMAIN"
+HEALTH_URL="$BASE_URL/health"
+MODELS_URL="$BASE_URL/v1/models"
+
+echo -e "${BLUE}📋 Environment: $ENVIRONMENT${NC}"
+echo "  Domain: $DOMAIN"
+echo "  Worker: $WORKER_NAME"
+echo "  Base URL: $BASE_URL"
+echo ""
+
+# Function to test endpoint
+test_endpoint() {
+    local name="$1"
+    local url="$2"
+    local expected_pattern="$3"
+    local auth_header="$4"
+    
+    echo -n -e "${BLUE}Testing $name...${NC} "
+    
+    local curl_cmd="curl -s -m 10"
+    if [ -n "$auth_header" ]; then
+        curl_cmd="$curl_cmd -H \"$auth_header\""
+    fi
+    
+    if response=$(eval "$curl_cmd \"$url\"" 2>/dev/null); then
+        if [ -n "$expected_pattern" ] && echo "$response" | grep -q "$expected_pattern"; then
+            echo -e "${GREEN}✅ Working${NC}"
+            echo "    Response: $response"
+            return 0
+        elif [ -z "$expected_pattern" ]; then
+            echo -e "${GREEN}✅ Reachable${NC}"
+            echo "    Response: $response"
+            return 0
+        else
+            echo -e "${YELLOW}⚠️ Unexpected response${NC}"
+            echo "    Response: $response"
+            return 1
+        fi
+    else
+        echo -e "${RED}❌ Failed${NC}"
+        return 1
+    fi
+}
+
+# Test DNS resolution
+echo -e "${BLUE}🔍 DNS Resolution${NC}"
+if nslookup "$DOMAIN" > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ DNS resolving for $DOMAIN${NC}"
+else
+    echo -e "${RED}❌ DNS not resolving for $DOMAIN${NC}"
+fi
+
+echo ""
+
+# Test basic endpoints
+echo -e "${BLUE}🧪 Basic Health Checks${NC}"
+test_endpoint "Health endpoint" "$HEALTH_URL" "teenytiny-api"
+test_endpoint "Models endpoint (unauthenticated)" "$MODELS_URL" ""
+
+echo ""
+
+# Test authenticated endpoints if API key is available
+echo -e "${BLUE}🔐 Authenticated Endpoints${NC}"
+
+# Load .env file for API key (optional for health checks)
+if [ -f "$INFRA_DIR/.env" ]; then
+    source "$INFRA_DIR/.env"
+fi
+
+if [ -n "$API_KEY" ] && [ "$API_KEY" != "" ]; then
+    echo "Using API key for $ENVIRONMENT environment"
+    test_endpoint "Models endpoint (authenticated)" "$MODELS_URL" "echo" "Authorization: Bearer $API_KEY"
+    test_endpoint "Chat completions endpoint" "$BASE_URL/v1/chat/completions" "" "Authorization: Bearer $API_KEY"
+else
+    echo -e "${YELLOW}⚠️ No API key found for $ENVIRONMENT environment${NC}"
+    echo "Add API_KEY=your-key to infra/.env file for authenticated endpoint testing"
+fi
+
+echo ""
+
+# Summary
+echo -e "${CYAN}📊 Health Check Summary${NC}"
+echo "Environment: $ENVIRONMENT"
+echo "Domain: $DOMAIN"
+echo "Base URL: $BASE_URL"
+
+# Check Terraform state if available
+cd "$INFRA_DIR/terraform" 2>/dev/null || true
+if [ -f "terraform.tfstate" ]; then
+    echo ""
+    echo -e "${BLUE}🏗️ Infrastructure Status${NC}"
+    if terraform show -json terraform.tfstate | jq -e ".values.root_module.resources[] | select(.address == \"cloudflare_worker_script.main\")" > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Worker deployed via Terraform${NC}"
+    else
+        echo -e "${YELLOW}⚠️ Worker not found in Terraform state${NC}"
+    fi
+fi
+
+echo ""
+echo -e "${GREEN}🎯 Health check completed!${NC}"

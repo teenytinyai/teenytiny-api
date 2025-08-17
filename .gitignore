@@ -1,14 +1,12 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Build output
 dist/
 
 # Environment variables
 .env
-.env.local
-.env.production
+infra/.env
 
 # IDE
 .vscode/
@@ -23,14 +21,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
@@ -43,6 +33,12 @@ temp/
 # Wrangler generated files
 .wrangler/
 wrangler-local.sqlite
+
+# Terraform files (keep .terraform.lock.hcl)
+infra/terraform/.terraform/
+infra/terraform/terraform.tfstate*
+infra/terraform/*.tfplan
+infra/terraform/*.tfstate*
 
 # Test artifacts
 .vitest/
