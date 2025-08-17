@@ -12,6 +12,7 @@ import { InvalidRequestError, NotFoundError } from './openai-protocol/errors.js'
 import { ModelRegistry } from './models/model-registry.js';
 import { OpenAIModelRegistry } from './openai-protocol/openai-model-registry.js';
 import { EchoModel } from './models/echo-model.js';
+import { ElizaModel } from './models/eliza-model.js';
 import { DelayModelware } from './modelware/delay-modelware.js';
 import { StreamSplitModelware } from './modelware/stream-split-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
@@ -35,7 +36,12 @@ export function createApp(config: AppConfig) {
   const streamSplitEcho = new StreamSplitModelware(echoModel, StreamSplitModelware.WORDS);
   const delayedEchoModel = new DelayModelware(streamSplitEcho, 50);
   
+  const elizaModel = new ElizaModel();
+  const streamSplitEliza = new StreamSplitModelware(elizaModel, StreamSplitModelware.WORDS);
+  const delayedElizaModel = new DelayModelware(streamSplitEliza, 100);
+  
   openaiRegistry.register('echo', delayedEchoModel);
+  openaiRegistry.register('eliza', delayedElizaModel);
 
   // Middleware
   app.use('*', corsMiddleware());

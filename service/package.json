@@ -11,8 +11,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "vitest",
-    "test:ci": "vitest run",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "cf:dev": "wrangler dev",
     "cli": "tsx src/cli.ts"
   },
