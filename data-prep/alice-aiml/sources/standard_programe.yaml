@@ -25,11 +25,14 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-personality.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-pickup.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-politics.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-profile.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-religion.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-robot.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-sales.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-sextalk.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-sports.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-srai.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/standard-aiml-1.1.17-programe/std-suffixes.aiml"

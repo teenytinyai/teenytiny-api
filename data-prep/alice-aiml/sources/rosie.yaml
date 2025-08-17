@@ -10,11 +10,14 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/default.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/dialog.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/inappropriate.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/inquiry.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/insults.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/knowledge.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/personality.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/profanity.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/reductions1.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/reductions2.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/rosie/reductions_update.aiml"

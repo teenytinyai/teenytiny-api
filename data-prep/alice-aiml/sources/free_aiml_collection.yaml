@@ -38,4 +38,5 @@ files:
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/whatday_usa.aiml"
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/wordplay.aiml"
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/yomama.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/pandorabots/Free-AIML/master/zbert.aiml"

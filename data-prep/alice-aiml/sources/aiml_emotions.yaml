@@ -16,6 +16,7 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/date.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/default.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/drugs.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/emotion.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/emotions.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/food.aiml"
@@ -45,6 +46,7 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/phone.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/pickup.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/politics.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/primeminister.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/primitive-math.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/psychology.aiml"
@@ -57,10 +59,12 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/reduction4.safe.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/reductions-update.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/religion.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/sal.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/salutations.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/science.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/sex.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/sports.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/stack.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/AIMLemotions/stories.aiml"

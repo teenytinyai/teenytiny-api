@@ -17,6 +17,7 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/date.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/default.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/drugs.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/emotion.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/food.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/geography.aiml"
@@ -45,6 +46,7 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/phone.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/pickup.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/politics.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/primeminister.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/primitive-math.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/psychology.aiml"
@@ -57,9 +59,11 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/reduction4.safe.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/reductions-update.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/religion.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/salutations.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/science.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/sex.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/sports.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/stack.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/aiml-en-us-foundation-alice/stories.aiml"

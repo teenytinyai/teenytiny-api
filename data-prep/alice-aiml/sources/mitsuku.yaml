@@ -37,4 +37,5 @@ files:
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/Mitsuku/whatday_usa.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/Mitsuku/wordplay.aiml"
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/Mitsuku/yomama.aiml"
+    exclude: true
   - url: "https://raw.githubusercontent.com/Orbiter/AIML_Archive/master/aiml/en/Mitsuku/zbert.aiml"
