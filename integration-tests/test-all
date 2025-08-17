@@ -10,12 +10,15 @@ cd "$SCRIPT_DIR"
 export TEENYTINY_URL=${TEENYTINY_URL:-"http://localhost:8080"}
 export TEENYTINY_API_KEY=${TEENYTINY_API_KEY:-"testkey"}
 
+# Max parallel jobs
+MAX_JOBS=${MAX_JOBS:-20}
+
 # Clean up old reports
 echo "Cleaning up previous test reports..."
 rm -rf reports
 mkdir -p reports
 
-echo "Running TeenyTiny AI Integration Tests"
+echo "Running TeenyTiny AI Integration Tests (parallel, max $MAX_JOBS jobs)"
 echo "Target: $TEENYTINY_URL (${TEENYTINY_API_KEY:0:7}...)"
 echo
 
@@ -32,31 +35,106 @@ if [[ ${#test_dirs[@]} -eq 0 ]]; then
     exit 1
 fi
 
-echo "Found ${#test_dirs[@]} test suite(s): ${test_dirs[*]}"
+# Function to run a single test suite
+run_test_suite() {
+    local dir="$1"
+    local suite_name="${dir%/}" # Remove trailing slash
+    local log_file="$SCRIPT_DIR/reports/${suite_name}.log"
+    local xml_file="$SCRIPT_DIR/reports/${suite_name}.xml"
+
+    printf "🚀 Starting suite %-20s see reports/%s.log\n" "$suite_name..." "$suite_name"
+
+    cd "$SCRIPT_DIR"
+    if "./$dir/test" >"$log_file" 2>&1; then
+        # Check if XML report shows any failures or errors
+        if [[ -f "$xml_file" ]]; then
+            # Extract failures and errors count from XML
+            local failures=$(grep -o 'failures="[0-9]*"' "$xml_file" | grep -o '[0-9]*' || echo "0")
+            local errors=$(grep -o 'errors="[0-9]*"' "$xml_file" | grep -o '[0-9]*' || echo "0")
+
+            if [[ "$failures" -gt 0 ]] || [[ "$errors" -gt 0 ]]; then
+                printf "💥 Finished suite %-20s with failures see reports/%s.log\n" "$suite_name" "$suite_name"
+                echo "FAILED" >"$SCRIPT_DIR/reports/${suite_name}.result"
+            else
+                printf "✅ Finished suite %-20s success\n" "$suite_name"
+                echo "PASSED" >"$SCRIPT_DIR/reports/${suite_name}.result"
+            fi
+        else
+            # No XML file, assume passed if exit code was 0
+            printf "✅ Finished suite %-20s success\n" "$suite_name"
+            echo "PASSED" >"$SCRIPT_DIR/reports/${suite_name}.result"
+        fi
+    else
+        printf "💥 Finished suite %-20s failed see reports/%s.log\n" "$suite_name" "$suite_name"
+        echo "FAILED" >"$SCRIPT_DIR/reports/${suite_name}.result"
+    fi
+}
+
+# Export the function and variables for parallel
+export -f run_test_suite
+export TEENYTINY_URL TEENYTINY_API_KEY SCRIPT_DIR
+
+# Run tests in parallel with job limit
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Running tests in parallel (max $MAX_JOBS concurrent)..."
 echo
 
-# Run tests in each directory
+# Run each test suite in parallel using background processes
+pids=()
+running=0
+
+for dir in "${test_dirs[@]}"; do
+    # Wait if we've reached max jobs
+    while [ $running -ge $MAX_JOBS ]; do
+        for i in "${!pids[@]}"; do
+            if ! kill -0 "${pids[$i]}" 2>/dev/null; then
+                wait "${pids[$i]}"
+                unset pids[$i]
+                ((running--))
+            fi
+        done
+        sleep 0.1
+    done
+
+    # Start new test
+    run_test_suite "$dir" &
+    pids+=($!)
+    ((running++))
+done
+
+# Wait for all remaining jobs to complete
+for pid in "${pids[@]}"; do
+    wait "$pid"
+done
+
+# Collect results
 passed=0
 failed=0
 failed_suites=()
 
-for dir in "${test_dirs[@]}"; do
-    suite_name="${dir%/}" # Remove trailing slash
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Running $suite_name tests..."
-    echo
+echo
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Collecting results..."
 
-    if "./$dir/test" "$@"; then
-        echo
-        echo "✅ $suite_name: PASSED"
-        ((passed++))
+for dir in "${test_dirs[@]}"; do
+    suite_name="${dir%/}"
+    result_file="reports/${suite_name}.result"
+
+    if [[ -f "$result_file" ]]; then
+        result=$(cat "$result_file")
+        if [[ "$result" == "PASSED" ]]; then
+            echo "✅ $suite_name: PASSED"
+            ((passed++))
+        else
+            echo "❌ $suite_name: FAILED"
+            ((failed++))
+            failed_suites+=("$suite_name")
+        fi
     else
-        echo
-        echo "❌ $suite_name: FAILED"
+        echo "⚠️  $suite_name: NO RESULT FILE"
         ((failed++))
         failed_suites+=("$suite_name")
     fi
-    echo
 done
 
 # Summary
@@ -70,7 +148,7 @@ echo "❌ Failed: $failed"
 echo "Generating xunit-viewer HTML report..."
 
 # Generate report using xunit-viewer with console output (both console and file)
-npx -y xunit-viewer -r reports -o reports/index.html --console | tee reports/report.txt
+npx -y xunit-viewer -r reports/ -o reports/index.html --console | tee reports/report.txt
 
 echo "✅ Test report generated at: $SCRIPT_DIR/reports/index.html"
 echo "✅ Console report saved to: $SCRIPT_DIR/reports/report.txt"
