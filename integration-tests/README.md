@@ -1,6 +1,16 @@
 # TeenyTiny AI Integration Tests
 
-Comprehensive integration testing suite for TeenyTiny AI service compatibility with various OpenAI client libraries and tools.
+Integration testing suite for TeenyTiny AI service compatibility with various client libraries and tools.
+
+## Test Suites
+
+| Suite | Language | Package |
+| --- | --- | --- |
+| **[python-openai](python-openai/)** | Python | [openai](https://github.com/openai/openai-python) |
+| **[python-langchain](python-langchain/)** | Python | [langchain](https://python.langchain.com/docs/introduction/) |
+| **[python-llm](python-llm/)** | Python | [llm](https://llm.datasette.io/en/stable/python-api.html) |
+| **[node-openai](node-openai/)** | JavaScript (Node.js) | [openai](https://github.com/openai/openai-node) |
+| **[node-vercel-ai-v3](node-vercel-ai-v3/)** | JavaScript (Node.js) | [ai](https://ai-sdk.dev/) |
 
 ## Quick Start
 
@@ -14,78 +24,27 @@ Or run individual test suites:
 python-openai/test
 ```
 
+
 ## Configuration
 
-Tests use environment variables with sensible defaults:
+Default configuration is to test against the local development service.
 
 ```bash
-export TEENYTINY_URL=http://localhost:8080    # Default: localhost:8080
-export TEENYTINY_API_KEY=testkey              # Default: testkey
+# If unset, these are the assumed defaults
+export TEENYTINY_URL=http://localhost:8080
+export TEENYTINY_API_KEY=testkey
 ```
 
+Alternatively, to test the prod/qa service:
 
-## Test Suites
+```bash
+export TEENYTINY_URL=http://qa.teenytiny.ai
+export TEENYTINY_API_KEY=<valid key>
+```
 
-### python-openai/
-Tests the official OpenAI Python SDK compatibility:
-- Basic chat completions
-- Streaming completions  
-- Models endpoint
-- Authentication and error handling
-- Message validation
-
-### python-langchain/
-Tests LangChain framework integration:
-- ChatOpenAI integration with custom base_url
-- LangChain message abstractions (HumanMessage, SystemMessage, etc.)
-- Chain composition with LCEL operators
-- Streaming (sync and async)
-- Usage metadata and token counting
-
-### python-litellm/
-Tests LiteLLM framework compatibility:
-- Custom OpenAI-compatible endpoint integration
-- LiteLLM's unified API across providers
-- Streaming and async operations
-- Utility functions (token counting, cost calculation)
-- Callback and logging features
-
-## Adding New Test Suites
-
-1. Create a new directory (e.g., `curl/`, `node-openai/`, etc.)
-2. Add an executable `test` script in that directory
-3. The script should:
-   - Use `TEENYTINY_URL` and `TEENYTINY_API_KEY` environment variables
-   - Exit with code 0 on success, non-zero on failure
-   - Test core OpenAI API compatibility
-
-The `./test-all` launcher will automatically discover and run your new test suite.
 
 ## Test Strategy
 
-All tests use the predictable "echo" model which:
-- Returns the last user message from the conversation
-- Provides deterministic responses for reliable testing
-- Supports both streaming and non-streaming modes
+All tests use the predictable "echo" model which simply returns the same text as passed in,
+ensuring test cases are predictable, while also being able to complete end-to-end integration.
 
-This allows testing API compatibility without depending on external AI services.
-
-## Example Test Patterns
-
-**Basic Completion Test:**
-```python
-response = client.chat.completions.create(
-    model="echo",
-    messages=[{"role": "user", "content": "Hello World"}]
-)
-assert response.choices[0].message.content == "Hello World"
-```
-
-**Authentication Test:**
-```python
-with pytest.raises(AuthenticationError):
-    invalid_client.chat.completions.create(
-        model="echo", 
-        messages=[{"role": "user", "content": "test"}]
-    )
-```
