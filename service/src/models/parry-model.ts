@@ -1,4 +1,6 @@
 import { Model } from './model.js';
+import { Choice } from '../utils/choice.js';
+import { ChoiceRegistry } from '../utils/choice-registry.js';
 
 /**
  * PARRY - A Classic Paranoid Schizophrenia Simulation
@@ -58,13 +60,34 @@ interface EmotionalState {
 }
 
 export class ParryModel implements Model {
+  readonly choices = new ChoiceRegistry();
+  
   private patterns: ParryPattern[] = [];
   private emotionalState: EmotionalState = { anger: 3, fear: 4, shame: 2 };
-  private delusionThemes: string[] = [];
+  
+  // Choice instances for deterministic testing
+  readonly themeAdditionChoice = this.choices.create('themeAdditionChoice', [true, false, false]); // 30% chance
+  readonly delusionThemeChoice = this.choices.create('delusionThemeChoice', [
+    "The bookies are still looking for me.",
+    "I think someone's been going through my mail.",
+    "There was a car parked outside my building again today.", 
+    "I shouldn't have gotten involved with those people in the first place.",
+    "They think I know more than I'm letting on.",
+    "I've been getting strange phone calls lately.",
+    "Someone's been asking my neighbors questions about me.",
+  ]);
+  
+  // Response choices for each pattern type - will be created dynamically
+  private responseChoices = new Map<string, Choice<string>>();
+  
+  // Emotional state response filtering choices
+  readonly emotionalResponseChoice = this.choices.create('emotionalResponseChoice', [
+    'anger', 'fear', 'shame', 'normal'
+  ]);
 
   constructor() {
     this.initializePatterns();
-    this.initializeDelusionThemes();
+    this.createResponseChoices();
   }
 
   private initializePatterns(): void {
@@ -243,16 +266,28 @@ export class ParryModel implements Model {
     this.patterns.sort((a, b) => b.weight - a.weight);
   }
 
-  private initializeDelusionThemes(): void {
-    this.delusionThemes = [
-      "The bookies are still looking for me.",
-      "I think someone's been going through my mail.",
-      "There was a car parked outside my building again today.", 
-      "I shouldn't have gotten involved with those people in the first place.",
-      "They think I know more than I'm letting on.",
-      "I've been getting strange phone calls lately.",
-      "Someone's been asking my neighbors questions about me.",
-    ];
+  /**
+   * Create Choice instances for each pattern's responses
+   * This allows tests to queue specific responses deterministically
+   */
+  private createResponseChoices(): void {
+    for (const pattern of this.patterns) {
+      const choiceName = `responses-${pattern.triggers[0] || 'unknown'}`;
+      this.responseChoices.set(
+        pattern.triggers[0] || 'unknown',
+        this.choices.create(choiceName, [...pattern.responses])
+      );
+    }
+  }
+  
+  /** Get response choice for a trigger (for test queuing) */
+  getResponseChoice(trigger: string): Choice<string> | undefined {
+    return this.responseChoices.get(trigger);
+  }
+  
+  /** Get emotional response choice (for test queuing) */
+  getEmotionalResponseChoice(): Choice<string> {
+    return this.emotionalResponseChoice;
   }
 
   private findMatchingPattern(input: string): ParryPattern | null {
@@ -322,11 +357,55 @@ export class ParryModel implements Model {
       responses = pattern.responses;
     }
 
-    const selectedResponse = responses[Math.floor(Math.random() * responses.length)];
+    // Use Choice system for deterministic response selection
+    const trigger = pattern.triggers[0] || 'unknown';
+    const responseChoice = this.responseChoices.get(trigger);
     
-    // Occasionally add spontaneous paranoid themes
-    if (Math.random() < 0.3) {
-      const theme = this.delusionThemes[Math.floor(Math.random() * this.delusionThemes.length)];
+    let selectedResponse: string;
+    if (responseChoice && responses.length === pattern.responses.length) {
+      // Use full original responses - pick from Choice
+      selectedResponse = responseChoice.pick();
+    } else {
+      // Emotional state filtered responses - create deterministic selection
+      const emotionalState = this.emotionalResponseChoice.pick();
+      
+      // Use the emotional state hint to pick deterministically from filtered responses
+      let filteredResponses = responses;
+      
+      switch (emotionalState) {
+        case 'anger':
+          filteredResponses = responses.filter(r => 
+            r.includes('?') || r.includes('!') || r.toLowerCase().includes('business') || r.toLowerCase().includes('why')
+          );
+          break;
+        case 'fear':
+          filteredResponses = responses.filter(r =>
+            r.toLowerCase().includes('they') || r.toLowerCase().includes('watching') || r.toLowerCase().includes('trust')
+          );
+          break;
+        case 'shame':
+          filteredResponses = responses.filter(r =>
+            r.toLowerCase().includes('private') || r.toLowerCase().includes('rather not') || r.toLowerCase().includes('personal')
+          );
+          break;
+        default:
+          // Use original filtered responses as-is
+          break;
+      }
+      
+      // If no responses match the emotional filter, use original filtered list
+      if (filteredResponses.length === 0) {
+        filteredResponses = responses;
+      }
+      
+      // Pick first item deterministically (tests can queue specific emotional states)
+      selectedResponse = filteredResponses[0] || "I don't understand.";
+    }
+    
+    // Use Choice system for theme addition decision
+    const shouldAddTheme = this.themeAdditionChoice.pick();
+    if (shouldAddTheme) {
+      const theme = this.delusionThemeChoice.pick();
       return `${selectedResponse} ${theme}`;
     }
     

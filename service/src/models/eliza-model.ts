@@ -1,4 +1,6 @@
 import { Model } from './model.js';
+import { Choice } from '../utils/choice.js';
+import { ChoiceRegistry } from '../utils/choice-registry.js';
 
 /**
  * ELIZA - A Classic Rogerian Psychotherapist Chatbot
@@ -51,14 +53,20 @@ interface Reflection {
 }
 
 export class ElizaModel implements Model {
+  readonly choices = new ChoiceRegistry();
+  
   private patterns: Pattern[] = [];
   private reflections: Reflection[] = [];
   private fallbackResponses: string[] = [];
+  
+  // Response choices for each pattern - will be created dynamically
+  private responseChoices = new Map<string, Choice<string>>();
 
   constructor() {
     this.initializePatterns();
     this.initializeReflections();
     this.initializeFallbacks();
+    this.createResponseChoices();
   }
 
   private initializePatterns(): void {
@@ -376,6 +384,31 @@ export class ElizaModel implements Model {
       'What comes to mind when you think about that?',
     ];
   }
+  
+  /**
+   * Create Choice instances for each pattern's responses
+   * This allows tests to queue specific responses deterministically
+   */
+  private createResponseChoices(): void {
+    for (const pattern of this.patterns) {
+      const choiceName = `responses-${pattern.keyword.replace(/\s+/g, '-')}`;
+      this.responseChoices.set(
+        pattern.keyword,
+        this.choices.create(choiceName, [...pattern.responses])
+      );
+    }
+  }
+  
+  /** Get response choice for a keyword (for test queuing) */
+  getResponseChoice(keyword: string): Choice<string> | undefined {
+    return this.responseChoices.get(keyword);
+  }
+  
+  /** Get fallback choice (for test queuing) */
+  getFallbackChoice(): Choice<string> {
+    // Create fallback choice on demand
+    return this.choices.create('fallback', [...this.fallbackResponses]);
+  }
 
 
   private applyReflections(text: string): string {
@@ -411,8 +444,9 @@ export class ElizaModel implements Model {
   }
 
   private generateResponse(pattern: Pattern, context: string): string {
-    // Select a random response template
-    const template = pattern.responses[Math.floor(Math.random() * pattern.responses.length)]!;
+    // Use Choice system for deterministic template selection
+    const responseChoice = this.responseChoices.get(pattern.keyword);
+    const template = responseChoice ? responseChoice.pick() : pattern.responses[0]!;
     
     if (template.includes('{context}')) {
       // Apply reflections to context before substitution
@@ -425,7 +459,7 @@ export class ElizaModel implements Model {
 
   async *process(input: string): AsyncGenerator<string> {
     if (!input.trim()) {
-      yield this.fallbackResponses[0]!;
+      yield 'Tell me more about that.';
       return;
     }
 
@@ -435,8 +469,9 @@ export class ElizaModel implements Model {
       const response = this.generateResponse(match.pattern, match.context);
       yield response;
     } else {
-      // Use a random fallback response
-      const fallback = this.fallbackResponses[Math.floor(Math.random() * this.fallbackResponses.length)]!;
+      // Use Choice system for deterministic fallback selection
+      const fallbackChoice = this.getFallbackChoice();
+      const fallback = fallbackChoice.pick();
       yield fallback;
     }
   }
