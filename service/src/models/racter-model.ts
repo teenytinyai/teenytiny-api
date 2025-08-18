@@ -56,7 +56,16 @@ interface WordCategory {
 
 export class RacterModel implements Model {
   private templates: RacterTemplate[] = [];
-  private wordCategories: WordCategory;
+  private wordCategories: WordCategory = {
+    nouns: [],
+    verbs: [],
+    adjectives: [],
+    abstracts: [],
+    emotions: [],
+    materials: [],
+    colors: [],
+    timeWords: []
+  };
   private associations: Map<string, string[]> = new Map();
   private lastConcepts: string[] = [];
 
@@ -221,7 +230,7 @@ export class RacterModel implements Model {
 
   private getRandomFromCategory(categoryName: keyof WordCategory): string {
     const category = this.wordCategories[categoryName];
-    return category[Math.floor(Math.random() * category.length)];
+    return category[Math.floor(Math.random() * category.length)] || 'mystery';
   }
 
   private generateFromTemplate(template: RacterTemplate): string {
@@ -247,11 +256,19 @@ export class RacterModel implements Model {
 
   private generateAssociativeFragment(): string {
     if (this.lastConcepts.length === 0) {
-      return this.generateFromTemplate(this.templates[0]);
+      const template = this.templates[0];
+      if (!template) return 'silence speaks volumes';
+      return this.generateFromTemplate(template);
     }
 
     // Try to build associations from recent concepts
     const baseConcept = this.lastConcepts[this.lastConcepts.length - 1];
+    if (!baseConcept) {
+      // Fallback to template generation
+      const template = this.templates[Math.floor(Math.random() * this.templates.length)];
+      if (!template) return 'chaos creates meaning';
+      return this.generateFromTemplate(template);
+    }
     const associations = this.associations.get(baseConcept) || [];
     
     if (associations.length > 0) {
@@ -266,11 +283,13 @@ export class RacterModel implements Model {
         `${associatedWord} and ${baseConcept} dance through ${adjective} infinity.`
       ];
       
-      return fragments[Math.floor(Math.random() * fragments.length)];
+      return fragments[Math.floor(Math.random() * fragments.length)] || 'silence';
     }
 
     // Fallback to template generation
-    return this.generateFromTemplate(this.templates[Math.floor(Math.random() * this.templates.length)]);
+    const template = this.templates[Math.floor(Math.random() * this.templates.length)];
+    if (!template) return 'chaos creates meaning';
+    return this.generateFromTemplate(template);
   }
 
   async *process(input: string): AsyncGenerator<string> {
@@ -290,13 +309,18 @@ export class RacterModel implements Model {
     const fragments: string[] = [];
     
     for (let i = 0; i < fragmentCount; i++) {
-      if (i === 0 || Math.random() < 0.6) {
-        // Use template generation
-        const template = this.templates[Math.floor(Math.random() * this.templates.length)];
-        fragments.push(this.generateFromTemplate(template));
-      } else {
+      // If we have concepts, prefer associative generation
+      if (this.lastConcepts.length > 0 && (i === 0 || Math.random() < 0.7)) {
         // Use associative generation
         fragments.push(this.generateAssociativeFragment());
+      } else {
+        // Use template generation
+        const template = this.templates[Math.floor(Math.random() * this.templates.length)];
+        if (template) {
+          fragments.push(this.generateFromTemplate(template));
+        } else {
+          fragments.push('silence');
+        }
       }
     }
     

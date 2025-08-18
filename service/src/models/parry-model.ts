@@ -61,7 +61,6 @@ export class ParryModel implements Model {
   private patterns: ParryPattern[] = [];
   private emotionalState: EmotionalState = { anger: 3, fear: 4, shame: 2 };
   private delusionThemes: string[] = [];
-  private lastTopicMentioned: string = '';
 
   constructor() {
     this.initializePatterns();
@@ -261,7 +260,13 @@ export class ParryModel implements Model {
     
     for (const pattern of this.patterns) {
       for (const keyword of pattern.keywords) {
-        if (keyword === '*' || normalized.includes(keyword.toLowerCase())) {
+        if (keyword === '*') {
+          return pattern;
+        }
+        
+        // Use word boundaries for better matching
+        const regex = new RegExp(`\\b${keyword.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+        if (regex.test(normalized)) {
           return pattern;
         }
       }
@@ -325,7 +330,7 @@ export class ParryModel implements Model {
       return `${selectedResponse} ${theme}`;
     }
     
-    return selectedResponse;
+    return selectedResponse || "I don't understand.";
   }
 
   async *process(input: string): AsyncGenerator<string> {
@@ -341,7 +346,7 @@ export class ParryModel implements Model {
       this.updateEmotionalState(pattern.emotionalImpact);
       
       // Store last topic for potential follow-up
-      this.lastTopicMentioned = pattern.triggers[0] || 'general';
+      // Track topic for future context
       
       // Select and yield response
       const response = this.selectResponse(pattern);

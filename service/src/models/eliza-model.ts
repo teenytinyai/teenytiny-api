@@ -377,13 +377,6 @@ export class ElizaModel implements Model {
     ];
   }
 
-  private normalizeInput(input: string): string {
-    return input
-      .toLowerCase()
-      .replace(/[^a-z0-9\s']/g, '') // Keep apostrophes for contractions
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
 
   private applyReflections(text: string): string {
     let result = text;
