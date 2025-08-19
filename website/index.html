@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>TeenyTiny.ai</title>
-    <meta name="description" content="TeenyTiny AI — A blast from the past, blazingly fast. Classic bots like ELIZA, PARRY, and Racter, reborn as an OpenAI-compatible API. Fast, free, and fun.">
-    
+    <meta name="description" content="TeenyTiny AI — A blast from the past, blazingly fast. Classic AI like ELIZA, PARRY, and RACTER, reborn as an OpenAI-compatible API.">
+
     <!-- Open Graph -->
-    <meta property="og:title" content="TeenyTiny AI: Yesterday's AI, today's reply">
+    <meta property="og:title" content="🤖 TeenyTiny AI">
     <meta property="og:description" content="A blast from the past, blazingly fast">
     <meta property="og:type" content="website">
-    
+    <meta property="og:image" content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🤖 TeenyTiny AI">
+    <meta name="twitter:description" content="A blast from the past, blazingly fast">
+    <meta name="twitter:image" content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png">
+
+
     <style>
         :root {
             --terminal-green: #00ff41;
@@ -36,7 +43,7 @@
         body {
             font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
             background: var(--bg-dark);
-            background-image: 
+            background-image:
                 repeating-linear-gradient(
                     0deg,
                     transparent,
@@ -463,7 +470,7 @@
             .callouts-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .models-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -474,34 +481,34 @@
                 flex-direction: column;
                 gap: 20px;
             }
-            
+
             .panel {
                 height: 350px;
                 flex: none;
             }
-            
+
             .hero-panels .panel:first-child {
                 height: 210px;
                 flex: none;
             }
-            
+
             .callouts-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .models-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .container {
                 padding: 0 12px;
             }
-            
+
             .footer-break {
                 display: block;
                 line-height: 1.2;
             }
-            
+
             .footer-inline {
                 display: none;
             }
@@ -514,7 +521,7 @@
         <div class="container">
             <h1>TeenyTiny AI<span class="cursor">_</span></h1>
             <p class="tagline">A blast from the past, blazingly fast</p>
-            
+
             <div class="hero-panels">
                 <!-- Chat Demo Panel -->
                 <div class="panel">
@@ -738,34 +745,34 @@
         function changeModel() {
             const select = document.getElementById('modelSelect');
             currentModel = select.value;
-            
+
             // Clear chat
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML = '';
-            
+
             // Update input prompt
             const input = document.getElementById('chatInput');
             input.value = prompts[currentModel];
-            
+
             firstMessage = true;
         }
-        
+
         function sendMessage() {
             const input = document.getElementById('chatInput');
             if (input.value.trim()) {
                 const chatMessages = document.getElementById('chatMessages');
                 const userMessage = input.value.trim();
-                
+
                 // Add user message
                 const userLine = document.createElement('div');
                 userLine.className = 'chat-line user';
                 userLine.textContent = `> ${userMessage}`;
                 chatMessages.appendChild(userLine);
-                
+
                 // Get appropriate response
                 const modelResponses = responses[currentModel];
                 const response = modelResponses[Math.floor(Math.random() * modelResponses.length)];
-                
+
                 // Add bot response
                 setTimeout(() => {
                     const botLine = document.createElement('div');
@@ -774,7 +781,7 @@
                     chatMessages.appendChild(botLine);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }, 300);
-                
+
                 // Clear input after first message or clear manually typed text
                 if (firstMessage) {
                     input.value = '';
@@ -795,7 +802,7 @@
         // API Key generation
         function generateApiKey() {
             const apiKey = 'tt-1234567890abcdef';
-            
+
             const content = document.getElementById('apiContent');
             content.style.justifyContent = 'flex-start';
             content.style.textAlign = 'left';
@@ -807,7 +814,7 @@
             curl: `curl -X POST https://teenytiny.ai/v1/chat/completions \\
   -H "Authorization: Bearer $TEENYTINY_API_KEY" \\
   -d '{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}'`,
-            
+
             'node-openai': `import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -823,7 +830,7 @@ const completion = await openai.chat.completions.create({
 });
 
 console.log(completion.choices[0].message.content);`,
-            
+
             'node-vercel-ai-v4': `import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
@@ -838,7 +845,7 @@ const { text } = await generateText({
 });
 
 console.log(text);`,
-            
+
             'node-vercel-ai-v5': `import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 
@@ -854,7 +861,7 @@ const { text } = await generateText({
 });
 
 console.log(text);`,
-            
+
             'python-openai': `import os
 from openai import OpenAI
 
@@ -869,7 +876,7 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)`,
-            
+
             'python-langchain': `import os
 from langchain_openai import ChatOpenAI
 
@@ -881,7 +888,7 @@ llm = ChatOpenAI(
 
 response = llm.invoke("Hello")
 print(response.content)`,
-            
+
             'python-litellm': `import os
 import litellm
 
@@ -892,7 +899,7 @@ response = litellm.completion(
     api_key=os.getenv("TEENYTINY_API_KEY")
 )
 print(response.choices[0].message.content)`,
-            
+
             'java-openai': `import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.*;
@@ -914,7 +921,7 @@ ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
 
 ChatCompletion completion = client.chat().completions().create(params);
 System.out.println(completion.choices().get(0).message().content().get());`,
-            
+
             'java-spring-ai': `import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -933,7 +940,7 @@ OpenAiChatModel chatModel = new OpenAiChatModel(openAiApi, options);
 
 ChatResponse response = chatModel.call(new Prompt("Hello"));
 System.out.println(response.getResult().getOutput().getContent());`,
-            
+
             'java-langchain4j': `import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 
@@ -946,7 +953,7 @@ ChatLanguageModel model = OpenAiChatModel.builder()
 
 String response = model.generate("Hello");
 System.out.println(response);`,
-            
+
             'go-openai': `package main
 
 import (
@@ -978,7 +985,7 @@ func main() {
 	}
 	fmt.Println(resp.Choices[0].Message.Content)
 }`,
-            
+
             'ruby-openai': `require 'openai'
 
 client = OpenAI::Client.new(
@@ -994,7 +1001,7 @@ response = client.chat(
 )
 
 puts response.dig('choices', 0, 'message', 'content')`,
-            
+
             'rust-openai': `use async_openai::{
     config::OpenAIConfig,
     types::{ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequestArgs},
