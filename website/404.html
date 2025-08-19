@@ -14,6 +14,16 @@
         body {
             font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
             background: var(--bg-dark);
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(64, 128, 64, 0.06) 2px,
+                    rgba(64, 128, 64, 0.06) 4px
+                ),
+                radial-gradient(circle at 25% 25%, #181a18 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #181a18 0%, transparent 50%);
             color: var(--text-light);
             margin: 0;
             padding: 0;
@@ -30,14 +40,59 @@
         }
         
         h1 {
-            font-size: 4rem;
+            font-size: clamp(8rem, 20vw, 16rem);
             color: var(--terminal-green);
-            text-shadow: 0 0 10px var(--terminal-green);
+            text-shadow: 0 0 30px var(--terminal-green);
             margin: 0;
+            font-weight: 800;
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 82%, 100% {
+                transform: translate(0) skew(0deg);
+                text-shadow: 0 0 30px var(--terminal-green);
+            }
+            84% {
+                transform: translate(-2px, 1px) skew(1deg);
+                text-shadow: 
+                    -2px 0 var(--terminal-green),
+                    2px 0 var(--text-light),
+                    0 0 30px var(--terminal-green);
+            }
+            86% {
+                transform: translate(3px, -2px) skew(-2deg);
+                text-shadow: 
+                    3px 0 var(--text-light),
+                    -3px 0 var(--terminal-green),
+                    0 0 30px var(--terminal-green);
+            }
+            88% {
+                transform: translate(-1px, 2px) skew(1deg);
+                text-shadow: 
+                    -1px 0 var(--terminal-green),
+                    1px 0 var(--text-light),
+                    0 0 30px var(--terminal-green);
+            }
+            90% {
+                transform: translate(4px, -1px) skew(-1deg);
+                text-shadow: 
+                    4px 0 var(--text-light),
+                    -4px 0 var(--terminal-green),
+                    0 0 30px var(--terminal-green);
+            }
+            92% {
+                transform: translate(-3px, 3px) skew(2deg);
+                text-shadow: 
+                    -3px 0 var(--terminal-green),
+                    3px 0 var(--text-light),
+                    0 0 30px var(--terminal-green);
+            }
         }
         
         h2 {
-            color: var(--terminal-green);
+            color: var(--text-light);
             margin: 1rem 0;
         }
         
@@ -60,7 +115,6 @@
     <div class="container">
         <h1>404</h1>
         <h2>Page Not Found</h2>
-        <p>The page you're looking for doesn't exist.</p>
         <p><a href="/">← Back to TeenyTiny AI</a></p>
     </div>
 </body>
