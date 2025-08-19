@@ -783,11 +783,7 @@
 
         // API Key generation
         function generateApiKey() {
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let apiKey = '';
-            for (let i = 0; i < 80; i++) {
-                apiKey += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            const apiKey = 'tt-1234567890abcdef';
             
             const content = document.getElementById('apiContent');
             content.style.justifyContent = 'flex-start';
