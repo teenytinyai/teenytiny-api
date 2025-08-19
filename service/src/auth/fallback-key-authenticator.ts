@@ -31,7 +31,7 @@ export class FallbackKeyAuthenticator implements Authenticator {
    * Generates API key using the primary (first) authenticator
    */
   async generateApiKey(): Promise<string> {
-    return this.authenticators[0].generateApiKey();
+    return this.authenticators[0]!.generateApiKey();
   }
 
   /**

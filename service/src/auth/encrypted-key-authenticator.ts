@@ -19,7 +19,7 @@ export class EncryptedKeyAuthenticator implements Authenticator {
 
   private secretString: string;
   private timestampFn: () => number;
-  private ivGeneratorFn?: () => Uint8Array;
+  private ivGeneratorFn: (() => Uint8Array) | undefined;
   private crypto: Crypto;
 
   /**
@@ -27,7 +27,7 @@ export class EncryptedKeyAuthenticator implements Authenticator {
    * @param timestampFn Optional timestamp function (defaults to Date.now, useful for deterministic testing)
    * @param ivGeneratorFn Optional IV generator function (defaults to crypto.getRandomValues, useful for deterministic testing)
    */
-  constructor(secretString: string, timestampFn?: () => number, ivGeneratorFn?: () => Uint8Array) {
+  constructor(secretString: string, timestampFn?: () => number, ivGeneratorFn?: (() => Uint8Array) | undefined) {
     this.validateSecret(secretString);
     this.secretString = secretString;
     this.timestampFn = timestampFn ?? Date.now;
@@ -135,10 +135,10 @@ export class EncryptedKeyAuthenticator implements Authenticator {
     const encrypted = await this.crypto.subtle.encrypt(
       {
         name: EncryptedKeyAuthenticator.ALGORITHM,
-        iv: iv
+        iv: iv as BufferSource
       },
       key,
-      plaintext
+      plaintext as BufferSource
     );
 
     // Combine IV + encrypted data (which includes auth tag)
@@ -187,7 +187,7 @@ export class EncryptedKeyAuthenticator implements Authenticator {
       const decrypted = await this.crypto.subtle.decrypt(
         {
           name: EncryptedKeyAuthenticator.ALGORITHM,
-          iv: iv
+          iv: iv as BufferSource
         },
         key,
         encrypted
