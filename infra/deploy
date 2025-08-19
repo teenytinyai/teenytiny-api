@@ -115,14 +115,15 @@ if [ "$CLOUDFLARE_ACCOUNT_ID" = "null" ] || [ "$CLOUDFLARE_ACCOUNT_ID" = "your-a
     exit 1
 fi
 
-# Step 1: Build the application
-echo -e "${BLUE}🔨 Building application...${NC}"
+# Step 1: Clean and build the application
+echo -e "${BLUE}🔨 Clean building application...${NC}"
 cd "$PROJECT_ROOT/service"
+rm -rf dist
 npm run build
 
 # Check if build output exists
-if [ ! -f "$PROJECT_ROOT/service/dist/index.js" ]; then
-    echo -e "${RED}❌ Build failed - service/dist/index.js not found${NC}"
+if [ ! -f "$PROJECT_ROOT/service/dist/src/index.js" ]; then
+    echo -e "${RED}❌ Build failed - service/dist/src/index.js not found${NC}"
     exit 1
 fi
 

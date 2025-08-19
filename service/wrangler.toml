@@ -1,6 +1,6 @@
 # Cloudflare Worker configuration  
 # Environment-specific settings (name, routes) are configured via deploy script
-main = "dist/index.js"
+main = "dist/src/index.js"
 compatibility_date = "2024-11-01"
 compatibility_flags = ["nodejs_compat"]
 
