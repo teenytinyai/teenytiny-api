@@ -1,864 +1,1127 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
-    <title>TeenyTiny.ai</title>
-    <meta name="description" content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side.">
-    
+    <title>TeenyTiny AI</title>
+    <meta
+      name="description"
+      content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side."
+    />
+
     <!-- Favicons -->
-    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="shortcut icon" href="/static/favicon.ico" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="🤖 TeenyTiny AI">
-    <meta property="og:description" content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="🤖 TeenyTiny AI">
-    <meta name="twitter:description" content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side.">
-    <meta name="twitter:image" content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png">
-
+    <meta property="og:title" content="TeenyTiny AI" />
+    <meta
+      property="og:description"
+      content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TeenyTiny AI" />
+    <meta
+      name="twitter:description"
+      content="Replace your slow, expensive, large language models with instantaneous, free, tiny language models. OpenAI API compatible. Probably no down side."
+    />
+    <meta
+      name="twitter:image"
+      content="https://teenytiny.ai/static/teenytiny-og-preview-1200x630.png"
+    />
 
     <style>
-        :root {
-            --terminal-green: #00ff41;
-            --bg-dark: #0a0a0a;
-            --bg-darker: #000000;
-            --text-light: #f0f0f0;
-            --text-gray: #888888;
-            --card-bg: #1a1a1a;
-            --border-color: #333333;
-        }
+      :root {
+        --terminal-green: #00ff41;
+        --bg-dark: #0a0a0a;
+        --bg-darker: #000000;
+        --text-light: #f0f0f0;
+        --text-gray: #888888;
+        --card-bg: #1a1a1a;
+        --border-color: #333333;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        html, body {
-            overscroll-behavior: none;
-            -webkit-overflow-scrolling: touch;
-        }
+      html,
+      body {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+      }
 
-        body {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            background: var(--bg-dark);
-            background-image:
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(64, 128, 64, 0.06) 2px,
-                    rgba(64, 128, 64, 0.06) 4px
-                ),
-                radial-gradient(circle at 25% 25%, #181a18 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, #181a18 0%, transparent 50%);
-            color: var(--text-light);
-            line-height: 1.5;
-        }
+      body {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        background: var(--bg-dark);
+        background-image:
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(64, 128, 64, 0.06) 2px,
+            rgba(64, 128, 64, 0.06) 4px
+          ),
+          radial-gradient(circle at 25% 25%, #181a18 0%, transparent 50%),
+          radial-gradient(circle at 75% 75%, #181a18 0%, transparent 50%);
+        color: var(--text-light);
+        line-height: 1.5;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-            width: 100%;
-        }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 16px;
+        width: 100%;
+      }
 
-        .cursor {
-            animation: blink 1s infinite;
-        }
+      .cursor {
+        animation: blink 1s infinite;
+      }
 
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
         }
-
-        /* Hero */
-        .hero {
-            padding: 48px 0;
-            text-align: center;
+        51%,
+        100% {
+          opacity: 0;
         }
+      }
 
-        .hero h1 {
-            font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-            font-size: clamp(2.5rem, 7vw, 5rem);
-            font-weight: 800;
-            margin-bottom: 12px;
-            color: var(--terminal-green);
-            text-shadow: 0 0 30px var(--terminal-green);
-        }
+      /* Hero */
+      .hero {
+        padding: 48px 0;
+        text-align: center;
+      }
 
-        .tagline {
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            margin-bottom: 32px;
-            color: var(--text-light);
-        }
+      .hero h1 {
+        font-family: "Nimbus Mono PS", "Courier New", monospace;
+        font-size: clamp(2.5rem, 7vw, 5rem);
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: var(--terminal-green);
+        text-shadow: 0 0 30px var(--terminal-green);
+      }
 
-        .hero-panels {
-            display: flex;
-            gap: 20px;
-            margin-top: 32px;
-            width: 100%;
-        }
+      .tagline {
+        font-size: clamp(1rem, 2.5vw, 1.5rem);
+        margin-bottom: 32px;
+        color: var(--text-light);
+      }
 
-        .panel {
-            background: var(--card-bg);
-            border-radius: 4px;
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            height: 400px;
-            flex: 1 1 50%;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
+      .hero-panels {
+        display: flex;
+        gap: 20px;
+        margin-top: 32px;
+        width: 100%;
+      }
 
-        .panel h3 {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            color: var(--terminal-green);
-        }
+      .panel {
+        background: var(--card-bg);
+        border-radius: 4px;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        height: 400px;
+        flex: 1 1 50%;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
 
-        .panel .chat-description {
-            font-size: 0.8rem;
-            color: var(--text-gray);
-            margin-bottom: 8px;
-        }
+      .panel h3 {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+        color: var(--terminal-green);
+      }
 
-        /* Chat Demo */
-        .model-selector {
-            margin-bottom: 0;
-        }
+      .panel .chat-description {
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        margin-bottom: 8px;
+      }
 
-        .model-selector select, .language-selector select {
-            background: var(--card-bg);
-            color: var(--text-light);
-            border: 1px solid var(--border-color);
-            border-radius: 2px 2px 0 0;
-            border-bottom: none;
-            padding: 6px 8px;
-            font-size: 1rem;
-            font-family: "SF Mono", Monaco, Menlo, "Consolas", "Ubuntu Mono", monospace !important;
-            width: 100%;
-            outline: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2300ff41' viewBox='0 0 12 8'%3E%3Cpath d='M6 8L0 2h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 12px;
-            padding-right: 32px;
-        }
+      /* Chat Demo */
+      .model-selector {
+        margin-bottom: 0;
+      }
 
-        .model-selector select:focus, .language-selector select:focus {
-            outline: none;
-            box-shadow: none;
-        }
+      .model-selector select,
+      .language-selector select {
+        background: var(--card-bg);
+        color: var(--text-light);
+        border: 1px solid var(--border-color);
+        border-radius: 2px 2px 0 0;
+        border-bottom: none;
+        padding: 6px 8px;
+        font-size: 1rem;
+        font-family:
+          "SF Mono", Monaco, Menlo, "Consolas", "Ubuntu Mono", monospace !important;
+        width: 100%;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2300ff41' viewBox='0 0 12 8'%3E%3Cpath d='M6 8L0 2h12z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px;
+        padding-right: 32px;
+      }
 
-        .chat-demo {
-            background: var(--bg-darker);
-            border-radius: 0 0 2px 2px;
-            padding: 8px;
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 13px;
-            flex: 1;
-            border: 1px solid var(--border-color);
-            border-top: none;
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            overflow: hidden;
-        }
+      .model-selector select:focus,
+      .language-selector select:focus {
+        outline: none;
+        box-shadow: none;
+      }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 8px;
-            max-height: 100%;
-        }
+      .chat-demo {
+        background: var(--bg-darker);
+        border-radius: 0 0 2px 2px;
+        padding: 8px;
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 13px;
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        overflow: hidden;
+      }
 
-        .chat-line {
-            margin-bottom: 4px;
-            word-wrap: break-word;
-        }
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 8px;
+        max-height: 100%;
+      }
 
-        .chat-line.user {
-            color: var(--terminal-green);
-        }
+      .chat-line {
+        margin-bottom: 4px;
+        word-wrap: break-word;
+      }
 
-        .chat-line.bot {
-            color: var(--text-light);
-        }
+      .chat-line.user {
+        color: var(--terminal-green);
+      }
 
-        .chat-input-line {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 8px;
-        }
+      .chat-line.bot {
+        color: var(--text-light);
+      }
 
-        .chat-input {
-            background: transparent;
-            border: none;
-            color: var(--terminal-green);
-            font-family: inherit;
-            font-size: inherit;
-            flex: 1;
-            outline: none;
-        }
+      .chat-input-line {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
+      }
 
-        .send-btn {
-            background: transparent;
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-            width: 20px;
-            height: 16px;
-            font-size: 10px;
-            cursor: pointer;
-            border-radius: 1px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
+      .chat-input {
+        background: transparent;
+        border: none;
+        color: var(--terminal-green);
+        font-family: inherit;
+        font-size: inherit;
+        flex: 1;
+        outline: none;
+      }
 
-        .send-btn:hover {
-            background: rgba(0, 255, 65, 0.1);
-        }
+      .send-btn {
+        background: transparent;
+        color: var(--terminal-green);
+        border: 1px solid var(--terminal-green);
+        width: 20px;
+        height: 16px;
+        font-size: 10px;
+        cursor: pointer;
+        border-radius: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
 
-        /* API Panel */
-        .api-panel-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            overflow: hidden;
-        }
+      .send-btn:hover {
+        background: rgba(0, 255, 65, 0.1);
+      }
 
-        .api-content {
-            background: var(--bg-darker);
-            border: 1px solid var(--border-color);
-            border-radius: 2px;
-            padding: 12px;
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 0.9rem;
-            color: var(--terminal-green);
-            margin: 0 0 16px 0;
-            word-break: break-all;
-            min-height: 60px;
-            height: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: left;
-        }
+      /* API Panel */
+      .api-panel-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+      }
 
-        .api-button {
-            background: transparent;
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 2px;
-            cursor: pointer;
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-        }
+      .api-content {
+        background: var(--bg-darker);
+        border: 1px solid var(--border-color);
+        border-radius: 2px;
+        padding: 12px;
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 0.9rem;
+        color: var(--terminal-green);
+        margin: 0 0 16px 0;
+        word-break: break-all;
+        min-height: 60px;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: left;
+      }
 
-        .api-button:hover {
-            background: var(--terminal-green);
-            color: var(--bg-darker);
-        }
+      .api-button {
+        background: transparent;
+        color: var(--terminal-green);
+        border: 1px solid var(--terminal-green);
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+      }
 
-        .language-selector {
-            margin-bottom: 0;
-        }
+      .api-button:hover {
+        background: var(--terminal-green);
+        color: var(--bg-darker);
+      }
 
-        .code-example {
-            background: var(--bg-darker);
-            border-radius: 0 0 2px 2px;
-            padding: 12px;
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 0.9rem;
-            color: var(--terminal-green);
-            overflow-x: auto;
-            overflow-y: auto;
-            flex: 1;
-            border: 1px solid var(--border-color);
-            border-top: none;
-            text-align: left;
-            white-space: pre;
-            word-break: break-all;
-            overflow-wrap: anywhere;
-            max-height: 320px;
-            min-width: 0;
-            width: 100%;
-            box-sizing: border-box;
-        }
+      .language-selector {
+        margin-bottom: 0;
+      }
 
-        /* Callout Boxes */
-        .callouts {
-            padding: 48px 0;
-        }
+      .code-example {
+        background: var(--bg-darker);
+        border-radius: 0 0 2px 2px;
+        padding: 12px;
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 0.9rem;
+        color: var(--terminal-green);
+        overflow-x: auto;
+        overflow-y: auto;
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        text-align: left;
+        white-space: pre;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        max-height: 320px;
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
 
+      /* Callout Boxes */
+      .callouts {
+        padding: 48px 0;
+      }
+
+      .callouts-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .callout {
+        background: var(--card-bg);
+        border-radius: 4px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+      }
+
+      .callout .icon {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 12px;
+        stroke: white;
+        fill: none;
+      }
+
+      .callout h3 {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+        color: var(--terminal-green);
+      }
+
+      .callout p {
+        font-size: 0.9rem;
+        color: var(--text-gray);
+      }
+
+      /* Models Section */
+      .models {
+        padding: 48px 0;
+        background: var(--bg-darker);
+      }
+
+      .models h2 {
+        font-family: "Nimbus Mono PS", "Courier New", monospace;
+        text-align: center;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        margin-bottom: 32px;
+        color: var(--terminal-green);
+        text-shadow: 0 0 15px var(--terminal-green);
+      }
+
+      .models-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .model {
+        background: var(--card-bg);
+        border-radius: 4px;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+      }
+
+      .model-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 8px;
+      }
+
+      .model h3 {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        color: var(--terminal-green);
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      .model-year {
+        color: var(--text-gray);
+        font-size: 0.85rem;
+      }
+
+      .model p {
+        font-size: 0.9rem;
+        color: var(--text-gray);
+      }
+
+      /* FAQ */
+      .faq {
+        padding: 48px 0;
+      }
+
+      .faq h2 {
+        font-family: "Nimbus Mono PS", "Courier New", monospace;
+        text-align: center;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        margin-bottom: 32px;
+        color: var(--terminal-green);
+        text-shadow: 0 0 15px var(--terminal-green);
+      }
+
+      .faq-container {
+        background: var(--card-bg);
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+      }
+
+      .faq-item {
+        margin-bottom: 20px;
+      }
+
+      .faq-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .faq-question {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-weight: 600;
+        color: var(--terminal-green);
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+      }
+
+      .faq-answer {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        margin-bottom: 0;
+      }
+
+      /* Footer */
+      footer {
+        padding: 32px 0;
+        text-align: center;
+        background: var(--bg-darker);
+        border-top: 1px solid var(--border-color);
+      }
+
+      .footer-content {
+        font-family:
+          ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 0.9rem;
+        color: var(--text-gray);
+        line-height: 1.3;
+      }
+
+      .footer-content a {
+        color: var(--terminal-green);
+        text-decoration: none;
+      }
+
+      .footer-content a:hover {
+        text-decoration: underline;
+      }
+
+      .footer-break {
+        display: none;
+      }
+
+      .footer-inline {
+        display: inline;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
         .callouts-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .callout {
-            background: var(--card-bg);
-            border-radius: 4px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .callout .icon {
-            width: 32px;
-            height: 32px;
-            margin: 0 auto 12px;
-            stroke: white;
-            fill: none;
-        }
-
-        .callout h3 {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-            color: var(--terminal-green);
-        }
-
-        .callout p {
-            font-size: 0.9rem;
-            color: var(--text-gray);
-        }
-
-        /* Models Section */
-        .models {
-            padding: 48px 0;
-            background: var(--bg-darker);
-        }
-
-        .models h2 {
-            font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-            text-align: center;
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            margin-bottom: 32px;
-            color: var(--terminal-green);
-            text-shadow: 0 0 15px var(--terminal-green);
+          grid-template-columns: repeat(2, 1fr);
         }
 
         .models-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-panels {
+          flex-direction: column;
+          gap: 20px;
         }
 
-        .model {
-            background: var(--card-bg);
-            border-radius: 4px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
+        .panel {
+          height: 350px;
+          flex: none;
         }
 
-        .model-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 8px;
+        .hero-panels .panel:first-child {
+          height: 210px;
+          flex: none;
         }
 
-        .model h3 {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            color: var(--terminal-green);
-            font-size: 1.2rem;
-            margin: 0;
+        .callouts-grid {
+          grid-template-columns: 1fr;
         }
 
-        .model-year {
-            color: var(--text-gray);
-            font-size: 0.85rem;
+        .models-grid {
+          grid-template-columns: 1fr;
         }
 
-        .model p {
-            font-size: 0.9rem;
-            color: var(--text-gray);
-        }
-
-        /* FAQ */
-        .faq {
-            padding: 48px 0;
-        }
-
-        .faq h2 {
-            font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-            text-align: center;
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            margin-bottom: 32px;
-            color: var(--terminal-green);
-            text-shadow: 0 0 15px var(--terminal-green);
-        }
-
-        .faq-container {
-            background: var(--card-bg);
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            padding: 24px;
-        }
-
-        .faq-item {
-            margin-bottom: 20px;
-        }
-
-        .faq-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .faq-question {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-weight: 600;
-            color: var(--terminal-green);
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-        }
-
-        .faq-answer {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-        /* Footer */
-        footer {
-            padding: 32px 0;
-            text-align: center;
-            background: var(--bg-darker);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer-content {
-            font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
-            font-size: 0.9rem;
-            color: var(--text-gray);
-            line-height: 1.3;
-        }
-
-        .footer-content a {
-            color: var(--terminal-green);
-            text-decoration: none;
-        }
-
-        .footer-content a:hover {
-            text-decoration: underline;
+        .container {
+          padding: 0 12px;
         }
 
         .footer-break {
-            display: none;
+          display: block;
+          line-height: 1.2;
         }
 
         .footer-inline {
-            display: inline;
+          display: none;
         }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .callouts-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .models-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero-panels {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .panel {
-                height: 350px;
-                flex: none;
-            }
-
-            .hero-panels .panel:first-child {
-                height: 210px;
-                flex: none;
-            }
-
-            .callouts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .models-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-                padding: 0 12px;
-            }
-
-            .footer-break {
-                display: block;
-                line-height: 1.2;
-            }
-
-            .footer-inline {
-                display: none;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <h1>TeenyTiny AI<span class="cursor">_</span></h1>
-            <p class="tagline">A blast from the past, blazingly fast</p>
-            <p class="tagline" style="font-size: 0.9rem; text-wrap: balance;">Replace your <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">slow</strong>, <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">expensive</strong>, <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">large</strong> language models with <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">instantaneous</strong>, <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">free</strong>, <strong style="color: var(--terminal-green); text-shadow: 0 0 10px var(--terminal-green);">tiny</strong> language models. OpenAI API compatible. Probably no down side.</p>
+      <div class="container">
+        <h1>TeenyTiny AI<span class="cursor">_</span></h1>
+        <p class="tagline">A blast from the past, blazingly fast</p>
+        <p class="tagline" style="font-size: 0.9rem; text-wrap: balance">
+          Replace your
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >slow</strong
+          >,
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >expensive</strong
+          >,
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >large</strong
+          >
+          language models with
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >instantaneous</strong
+          >,
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >free</strong
+          >,
+          <strong
+            style="
+              color: var(--terminal-green);
+              text-shadow: 0 0 10px var(--terminal-green);
+            "
+            >tiny</strong
+          >
+          language models. OpenAI API compatible. Probably no down side.
+        </p>
 
-            <div class="hero-panels">
-                <!-- Chat Demo Panel -->
-                <div class="panel">
-                    <h3>Chat Now</h3>
-                    <div class="chat-description">Chat now with our AI from another era...</div>
-                    <div class="model-selector">
-                        <select id="modelSelect" onchange="changeModel()" style="font-family: 'SF Mono', Monaco, Menlo, 'Consolas', 'Ubuntu Mono', monospace !important;">
-                            <option value="eliza">ELIZA (1966) - Therapist, asks reflective questions</option>
-                            <option value="parry">PARRY (1972) - Paranoid, argumentative responses</option>
-                            <option value="racter">RACTER (1983) - Nonsense poet, creative text</option>
-                        </select>
-                    </div>
-                    <div class="chat-demo" id="chatDemo">
-                        <div class="chat-messages" id="chatMessages"></div>
-                        <div class="chat-input-line">
-                            <span style="color: var(--terminal-green);">&gt;</span>
-                            <input type="text" class="chat-input" value="Hello, I feel a bit uncertain today..." id="chatInput" data-1p-ignore>
-                            <button class="send-btn" onclick="sendMessage()">▲</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- API Panel -->
-                <div class="panel">
-                    <h3>Integrate Now</h3>
-                    <div class="chat-description" style="margin-bottom: 8px;">OpenAI compatible API. Two steps, takes two seconds...</div>
-                    <div class="api-panel-content">
-                        <div class="api-content" id="apiContent">
-                            <button class="api-button" onclick="generateApiKey()">Get API Key</button>
-                        </div>
-                        <div class="language-selector">
-                            <select id="languageSelect" onchange="updateCodeExample()" style="font-family: 'SF Mono', Monaco, Menlo, 'Consolas', 'Ubuntu Mono', monospace !important;">
-                                <option value="curl">cURL</option>
-                                <option value="node-openai">Node.js : OpenAI SDK</option>
-                                <option value="node-vercel-ai-v4">Node.js : Vercel AI SDK v4</option>
-                                <option value="node-vercel-ai-v5">Node.js : Vercel AI SDK v5</option>
-                                <option value="python-openai">Python : OpenAI SDK</option>
-                                <option value="python-langchain">Python : LangChain</option>
-                                <option value="python-litellm">Python : LiteLLM</option>
-                                <option value="java-openai">Java : OpenAI SDK</option>
-                                <option value="java-spring-ai">Java : Spring AI</option>
-                                <option value="java-langchain4j">Java : LangChain4J</option>
-                                <option value="go-openai">Go : OpenAI SDK</option>
-                                <option value="ruby-openai">Ruby : OpenAI Gem</option>
-                                <option value="rust-openai">Rust : async-openai</option>
-                            </select>
-                        </div>
-                        <div class="code-example" id="codeExample">curl -X POST https://teenytiny.ai/v1/chat/completions \
-  -H "Authorization: Bearer $TEENYTINY_API_KEY" \
-  -d '{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}'</div>
-                    </div>
-                </div>
+        <div class="hero-panels">
+          <!-- Chat Demo Panel -->
+          <div class="panel">
+            <h3>Chat Now</h3>
+            <div class="chat-description">
+              Chat now with our AI from another era...
             </div>
+            <div class="model-selector">
+              <select
+                id="modelSelect"
+                onchange="changeModel()"
+                style="
+                  font-family:
+                    &quot;SF Mono&quot;, Monaco, Menlo, &quot;Consolas&quot;,
+                    &quot;Ubuntu Mono&quot;, monospace !important;
+                "
+              >
+                <option value="eliza">
+                  ELIZA (1966) - Therapist, asks reflective questions
+                </option>
+                <option value="parry">
+                  PARRY (1972) - Paranoid, argumentative responses
+                </option>
+                <option value="racter">
+                  RACTER (1983) - Nonsense poet, creative text
+                </option>
+              </select>
+            </div>
+            <div class="chat-demo" id="chatDemo">
+              <div class="chat-messages" id="chatMessages"></div>
+              <div class="chat-input-line">
+                <span style="color: var(--terminal-green)">&gt;</span>
+                <input
+                  type="text"
+                  class="chat-input"
+                  value="Hello, I feel a bit uncertain today..."
+                  id="chatInput"
+                  data-1p-ignore
+                />
+                <button class="send-btn" onclick="sendMessage()">▲</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- API Panel -->
+          <div class="panel">
+            <h3>Integrate Now</h3>
+            <div class="chat-description" style="margin-bottom: 8px">
+              OpenAI compatible API. Two steps, takes two seconds...
+            </div>
+            <div class="api-panel-content">
+              <div class="api-content" id="apiContent">
+                <button class="api-button" onclick="generateApiKey()">
+                  Get API Key
+                </button>
+              </div>
+              <div class="language-selector">
+                <select
+                  id="languageSelect"
+                  onchange="updateCodeExample()"
+                  style="
+                    font-family:
+                      &quot;SF Mono&quot;, Monaco, Menlo, &quot;Consolas&quot;,
+                      &quot;Ubuntu Mono&quot;, monospace !important;
+                  "
+                >
+                  <option value="curl">cURL</option>
+                  <option value="node-openai">Node.js : OpenAI SDK</option>
+                  <option value="node-vercel-ai-v4">
+                    Node.js : Vercel AI SDK v4
+                  </option>
+                  <option value="node-vercel-ai-v5">
+                    Node.js : Vercel AI SDK v5
+                  </option>
+                  <option value="python-openai">Python : OpenAI SDK</option>
+                  <option value="python-langchain">Python : LangChain</option>
+                  <option value="python-litellm">Python : LiteLLM</option>
+                  <option value="java-openai">Java : OpenAI SDK</option>
+                  <option value="java-spring-ai">Java : Spring AI</option>
+                  <option value="java-langchain4j">Java : LangChain4J</option>
+                  <option value="go-openai">Go : OpenAI SDK</option>
+                  <option value="ruby-openai">Ruby : OpenAI Gem</option>
+                  <option value="rust-openai">Rust : async-openai</option>
+                </select>
+              </div>
+              <div class="code-example" id="codeExample">
+                curl -X POST https://teenytiny.ai/v1/chat/completions \ -H
+                "Authorization: Bearer $TEENYTINY_API_KEY" \ -d '{"model":
+                "eliza", "messages": [{"role": "user", "content": "Hello"}]}'
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Callout Boxes -->
     <section class="callouts">
-        <div class="container">
-            <h2 style="font-family: 'Nimbus Mono PS', 'Courier New', monospace; text-align: center; font-size: clamp(1.5rem, 3.5vw, 2rem); margin-bottom: 40px; color: var(--terminal-green); text-shadow: 0 0 15px var(--terminal-green);">It's good because...</h2>
-            <div class="callouts-grid">
-                <div class="callout">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="white" fill="none"/>
-                    </svg>
-                    <h3>Fast & Free</h3>
-                    <p>Responses feel instant — millions of tokens per second. Free… for now!</p>
-                </div>
-                <div class="callout">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <rect x="4" y="4" width="16" height="12" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
-                        <rect x="6" y="6" width="12" height="8" fill="var(--bg-dark)" stroke="white" stroke-width="0.5"/>
-                        <line x1="6" y1="8" x2="18" y2="8" stroke="white" stroke-width="0.5"/>
-                        <line x1="6" y1="10" x2="18" y2="10" stroke="white" stroke-width="0.5"/>
-                        <line x1="6" y1="12" x2="18" y2="12" stroke="white" stroke-width="0.5"/>
-                        <circle cx="8" cy="7" r="0.5" fill="white"/>
-                    </svg>
-                    <h3>Retro Soul</h3>
-                    <p>Classic chatbots from the 60s–80s, reborn.</p>
-                </div>
-                <div class="callout">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="white" stroke-width="2"/>
-                        <circle cx="12" cy="16" r="1" fill="white"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="white" stroke-width="2"/>
-                    </svg>
-                    <h3>Private</h3>
-                    <p>Your conversations are never stored. Ever.</p>
-                </div>
-                <div class="callout">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M4 6h16M4 12h16M4 18h16" stroke="white" stroke-width="2" fill="none"/>
-                        <circle cx="20" cy="6" r="2" fill="white"/>
-                        <circle cx="20" cy="12" r="2" fill="white"/>
-                        <circle cx="20" cy="18" r="2" fill="white"/>
-                    </svg>
-                    <h3>Drop-In Replacement</h3>
-                    <p>Fully OpenAI API compatible — just swap the key.</p>
-                </div>
-            </div>
+      <div class="container">
+        <h2
+          style="
+            font-family:
+              &quot;Nimbus Mono PS&quot;, &quot;Courier New&quot;, monospace;
+            text-align: center;
+            font-size: clamp(1.5rem, 3.5vw, 2rem);
+            margin-bottom: 40px;
+            color: var(--terminal-green);
+            text-shadow: 0 0 15px var(--terminal-green);
+          "
+        >
+          It's good because...
+        </h2>
+        <div class="callouts-grid">
+          <div class="callout">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path
+                d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+                stroke="white"
+                fill="none"
+              />
+            </svg>
+            <h3>Fast & Free</h3>
+            <p>
+              Responses feel instant — millions of tokens per second. Free… for
+              now!
+            </p>
+          </div>
+          <div class="callout">
+            <svg class="icon" viewBox="0 0 24 24">
+              <rect
+                x="4"
+                y="4"
+                width="16"
+                height="12"
+                rx="1"
+                fill="none"
+                stroke="white"
+                stroke-width="1.5"
+              />
+              <rect
+                x="6"
+                y="6"
+                width="12"
+                height="8"
+                fill="var(--bg-dark)"
+                stroke="white"
+                stroke-width="0.5"
+              />
+              <line
+                x1="6"
+                y1="8"
+                x2="18"
+                y2="8"
+                stroke="white"
+                stroke-width="0.5"
+              />
+              <line
+                x1="6"
+                y1="10"
+                x2="18"
+                y2="10"
+                stroke="white"
+                stroke-width="0.5"
+              />
+              <line
+                x1="6"
+                y1="12"
+                x2="18"
+                y2="12"
+                stroke="white"
+                stroke-width="0.5"
+              />
+              <circle cx="8" cy="7" r="0.5" fill="white" />
+            </svg>
+            <h3>Retro Soul</h3>
+            <p>Classic chatbots from the 60s–80s, reborn.</p>
+          </div>
+          <div class="callout">
+            <svg class="icon" viewBox="0 0 24 24">
+              <rect
+                x="3"
+                y="11"
+                width="18"
+                height="11"
+                rx="2"
+                ry="2"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+              />
+              <circle cx="12" cy="16" r="1" fill="white" />
+              <path
+                d="M7 11V7a5 5 0 0 1 10 0v4"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+              />
+            </svg>
+            <h3>Private</h3>
+            <p>Your conversations are never stored. Ever.</p>
+          </div>
+          <div class="callout">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="white"
+                stroke-width="2"
+                fill="none"
+              />
+              <circle cx="20" cy="6" r="2" fill="white" />
+              <circle cx="20" cy="12" r="2" fill="white" />
+              <circle cx="20" cy="18" r="2" fill="white" />
+            </svg>
+            <h3>Drop-In Replacement</h3>
+            <p>Fully OpenAI API compatible — just swap the key.</p>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Models Section -->
     <section class="models">
-        <div class="container">
-            <h2>The tiniest models...</h2>
-            <div class="models-grid">
-                <div class="model">
-                    <div class="model-header">
-                        <h3>ELIZA</h3>
-                        <div class="model-year">(1966)</div>
-                    </div>
-                    <p>Therapist-y responses, uncanny reflections.<br><a href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#eliza-model" target="_blank" style="color: var(--terminal-green); text-decoration: none; font-size: 0.8rem;">Learn more</a></p>
-                </div>
-                <div class="model">
-                    <div class="model-header">
-                        <h3>PARRY</h3>
-                        <div class="model-year">(1972)</div>
-                    </div>
-                    <p>Paranoid, argumentative, retro drama.<br><a href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#parry-model" target="_blank" style="color: var(--terminal-green); text-decoration: none; font-size: 0.8rem;">Learn more</a></p>
-                </div>
-                <div class="model">
-                    <div class="model-header">
-                        <h3>RACTER</h3>
-                        <div class="model-year">(1983)</div>
-                    </div>
-                    <p>Nonsense poet, wrote a novel.<br><a href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#racter-model" target="_blank" style="color: var(--terminal-green); text-decoration: none; font-size: 0.8rem;">Learn more</a></p>
-                </div>
-                <div class="model">
-                    <div class="model-header">
-                        <h3>ALICE</h3>
-                        <div class="model-year">(1995)</div>
-                    </div>
-                    <p>Won awards, big brain know-it-all.<br><span style="color: var(--text-gray); font-size: 0.8rem;">(Coming Soon)</span></p>
-                </div>
+      <div class="container">
+        <h2>The tiniest models...</h2>
+        <div class="models-grid">
+          <div class="model">
+            <div class="model-header">
+              <h3>ELIZA</h3>
+              <div class="model-year">(1966)</div>
             </div>
+            <p>
+              Therapist-y responses, uncanny reflections.<br /><a
+                href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#eliza-model"
+                target="_blank"
+                style="
+                  color: var(--terminal-green);
+                  text-decoration: none;
+                  font-size: 0.8rem;
+                "
+                >Learn more</a
+              >
+            </p>
+          </div>
+          <div class="model">
+            <div class="model-header">
+              <h3>PARRY</h3>
+              <div class="model-year">(1972)</div>
+            </div>
+            <p>
+              Paranoid, argumentative, retro drama.<br /><a
+                href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#parry-model"
+                target="_blank"
+                style="
+                  color: var(--terminal-green);
+                  text-decoration: none;
+                  font-size: 0.8rem;
+                "
+                >Learn more</a
+              >
+            </p>
+          </div>
+          <div class="model">
+            <div class="model-header">
+              <h3>RACTER</h3>
+              <div class="model-year">(1983)</div>
+            </div>
+            <p>
+              Nonsense poet, wrote a novel.<br /><a
+                href="https://github.com/teenytinyai/teenytinyai/blob/main/MODELS.md#racter-model"
+                target="_blank"
+                style="
+                  color: var(--terminal-green);
+                  text-decoration: none;
+                  font-size: 0.8rem;
+                "
+                >Learn more</a
+              >
+            </p>
+          </div>
+          <div class="model">
+            <div class="model-header">
+              <h3>ALICE</h3>
+              <div class="model-year">(1995)</div>
+            </div>
+            <p>
+              Won awards, big brain know-it-all.<br /><span
+                style="color: var(--text-gray); font-size: 0.8rem"
+                >(Coming Soon)</span
+              >
+            </p>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- FAQ Section -->
     <section class="faq">
-        <div class="container">
-            <h2>FAQ</h2>
-            <div class="faq-container">
-                <div class="faq-item">
-                    <div class="faq-question">Do you store conversations?</div>
-                    <div class="faq-answer">No. Your conversations are never stored. Ever.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">How fast is it really?</div>
-                    <div class="faq-answer">Responses feel instant — tiny models can process millions of tokens per second.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">How much does it cost?</div>
-                    <div class="faq-answer">It's free… for now!</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Is it compatible with my existing code?</div>
-                    <div class="faq-answer">Yes. Drop-in replacement for the OpenAI API.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Are these as powerful as modern AIs?</div>
-                    <div class="faq-answer">Nope. They won't code your startup — but they'll entertain you for minutes.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">What's with the old-school bots?</div>
-                    <div class="faq-answer">Classics from the 60s–80s (ELIZA, PARRY, etc.) wrapped in a modern API.</div>
-                </div>
+      <div class="container">
+        <h2>FAQ</h2>
+        <div class="faq-container">
+          <div class="faq-item">
+            <div class="faq-question">Do you store conversations?</div>
+            <div class="faq-answer">
+              No. Your conversations are never stored. Ever.
             </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How fast is it really?</div>
+            <div class="faq-answer">
+              Responses feel instant — tiny models can process millions of
+              tokens per second.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How much does it cost?</div>
+            <div class="faq-answer">It's free… for now!</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              Is it compatible with my existing code?
+            </div>
+            <div class="faq-answer">
+              Yes. Drop-in replacement for the OpenAI API.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Are these as powerful as modern AIs?</div>
+            <div class="faq-answer">
+              Nope. They won't code your startup — but they'll entertain you for
+              minutes.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">What's with the old-school bots?</div>
+            <div class="faq-answer">
+              Classics from the 60s–80s (ELIZA, PARRY, etc.) wrapped in a modern
+              API.
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <a href="https://github.com/teenytinyai/teenytinyai/">GitHub</a> | Built by <a href="https://x.com/joewalnes">@joewalnes</a><span class="footer-break"><br>for fun, not for world domination. Hopefully.</span><span class="footer-inline"> for fun, not for world domination. Hopefully.</span>
-            </div>
+      <div class="container">
+        <div class="footer-content">
+          <a href="https://github.com/teenytinyai/teenytinyai/">GitHub</a> |
+          Built by <a href="https://x.com/joewalnes">@joewalnes</a
+          ><span class="footer-break"
+            ><br />for fun, not for world domination. Hopefully.</span
+          ><span class="footer-inline">
+            for fun, not for world domination. Hopefully.</span
+          >
         </div>
+      </div>
     </footer>
 
     <script>
-        // Model-specific prompts for chat input
-        const prompts = {
-            eliza: "Hello, I feel a bit uncertain today...",
-            parry: "How you feeling today?",
-            racter: "Tell me a story about colors..."
-        };
+      // Model-specific prompts for chat input
+      const prompts = {
+        eliza: "Hello, I feel a bit uncertain today...",
+        parry: "How you feeling today?",
+        racter: "Tell me a story about colors...",
+      };
 
-        let currentModel = 'eliza';
-        let firstMessage = true;
-        let cachedApiKey = null;
-        let conversationHistory = [];
+      let currentModel = "eliza";
+      let firstMessage = true;
+      let cachedApiKey = null;
+      let conversationHistory = [];
 
-        // Get API key with caching
-        async function getApiKey() {
-            if (cachedApiKey) {
-                return cachedApiKey;
-            }
-            
-            try {
-                const response = await fetch('/site/new-key', { method: 'POST' });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const data = await response.json();
-                cachedApiKey = data.key;
-                return cachedApiKey;
-            } catch (error) {
-                console.error('Failed to get API key:', error);
-                throw error;
-            }
+      // Get API key with caching
+      async function getApiKey() {
+        if (cachedApiKey) {
+          return cachedApiKey;
         }
 
-        function changeModel() {
-            const select = document.getElementById('modelSelect');
-            currentModel = select.value;
-
-            // Clear chat and conversation history
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
-            conversationHistory = [];
-
-            // Update input prompt
-            const input = document.getElementById('chatInput');
-            input.value = prompts[currentModel];
-
-            firstMessage = true;
+        try {
+          const response = await fetch("/site/new-key", { method: "POST" });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const data = await response.json();
+          cachedApiKey = data.key;
+          return cachedApiKey;
+        } catch (error) {
+          console.error("Failed to get API key:", error);
+          throw error;
         }
+      }
 
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            if (input.value.trim()) {
-                const chatMessages = document.getElementById('chatMessages');
-                const userMessage = input.value.trim();
+      function changeModel() {
+        const select = document.getElementById("modelSelect");
+        currentModel = select.value;
 
-                // Add user message to chat and conversation history
-                const userLine = document.createElement('div');
-                userLine.className = 'chat-line user';
-                userLine.textContent = `> ${userMessage}`;
-                chatMessages.appendChild(userLine);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Clear chat and conversation history
+        const chatMessages = document.getElementById("chatMessages");
+        chatMessages.innerHTML = "";
+        conversationHistory = [];
 
-                conversationHistory.push({ role: 'user', content: userMessage });
+        // Update input prompt
+        const input = document.getElementById("chatInput");
+        input.value = prompts[currentModel];
 
-                // Clear input
-                if (firstMessage) {
-                    input.value = '';
-                    firstMessage = false;
-                } else {
-                    input.value = '';
-                }
+        firstMessage = true;
+      }
 
-                // Show loading indicator
-                const loadingLine = document.createElement('div');
-                loadingLine.className = 'chat-line bot';
-                loadingLine.textContent = `${currentModel.toUpperCase()}: ...`;
-                chatMessages.appendChild(loadingLine);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+      async function sendMessage() {
+        const input = document.getElementById("chatInput");
+        if (input.value.trim()) {
+          const chatMessages = document.getElementById("chatMessages");
+          const userMessage = input.value.trim();
 
-                try {
-                    // Get API key and make request
-                    const apiKey = await getApiKey();
-                    
-                    const response = await fetch('/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${apiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            model: currentModel,
-                            messages: conversationHistory
-                        })
-                    });
+          // Add user message to chat and conversation history
+          const userLine = document.createElement("div");
+          userLine.className = "chat-line user";
+          userLine.textContent = `> ${userMessage}`;
+          chatMessages.appendChild(userLine);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                    if (!response.ok) {
-                        throw new Error(`API request failed: ${response.status}`);
-                    }
+          conversationHistory.push({ role: "user", content: userMessage });
 
-                    const data = await response.json();
-                    const botResponse = data.choices[0].message.content;
+          // Clear input
+          if (firstMessage) {
+            input.value = "";
+            firstMessage = false;
+          } else {
+            input.value = "";
+          }
 
-                    // Replace loading indicator with actual response
-                    loadingLine.textContent = `${currentModel.toUpperCase()}: ${botResponse}`;
-                    
-                    // Add bot response to conversation history
-                    conversationHistory.push({ role: 'assistant', content: botResponse });
+          // Show loading indicator
+          const loadingLine = document.createElement("div");
+          loadingLine.className = "chat-line bot";
+          loadingLine.textContent = `${currentModel.toUpperCase()}: ...`;
+          chatMessages.appendChild(loadingLine);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                } catch (error) {
-                    // Replace loading indicator with error message
-                    loadingLine.textContent = `${currentModel.toUpperCase()}: [Error: Could not get response. Please try again.]`;
-                    console.error('Chat API error:', error);
-                }
+          try {
+            // Get API key and make request
+            const apiKey = await getApiKey();
 
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+            const response = await fetch("/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: currentModel,
+                messages: conversationHistory,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`API request failed: ${response.status}`);
             }
+
+            const data = await response.json();
+            const botResponse = data.choices[0].message.content;
+
+            // Replace loading indicator with actual response
+            loadingLine.textContent = `${currentModel.toUpperCase()}: ${botResponse}`;
+
+            // Add bot response to conversation history
+            conversationHistory.push({
+              role: "assistant",
+              content: botResponse,
+            });
+          } catch (error) {
+            // Replace loading indicator with error message
+            loadingLine.textContent = `${currentModel.toUpperCase()}: [Error: Could not get response. Please try again.]`;
+            console.error("Chat API error:", error);
+          }
+
+          chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+      }
 
-        document.getElementById('chatInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+      document
+        .getElementById("chatInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
         });
 
-        // API Key generation
-        async function generateApiKey() {
-            const content = document.getElementById('apiContent');
-            
-            try {
-                // Show loading state
-                content.innerHTML = 'Generating...';
-                
-                const apiKey = await getApiKey();
-                
-                content.style.justifyContent = 'flex-start';
-                content.style.textAlign = 'left';
-                content.innerHTML = `TEENYTINY_API_KEY=${apiKey}`;
-            } catch (error) {
-                content.innerHTML = 'Error generating API key. Please try again.';
-                console.error('API key generation failed:', error);
-            }
-        }
+      // API Key generation
+      async function generateApiKey() {
+        const content = document.getElementById("apiContent");
 
-        // Code examples
-        const codeExamples = {
-            curl: `curl -X POST https://teenytiny.ai/v1/chat/completions \\
+        try {
+          // Show loading state
+          content.innerHTML = "Generating...";
+
+          const apiKey = await getApiKey();
+
+          content.style.justifyContent = "flex-start";
+          content.style.textAlign = "left";
+          content.innerHTML = `TEENYTINY_API_KEY=${apiKey}`;
+        } catch (error) {
+          content.innerHTML = "Error generating API key. Please try again.";
+          console.error("API key generation failed:", error);
+        }
+      }
+
+      // Code examples
+      const codeExamples = {
+        curl: `curl -X POST https://teenytiny.ai/v1/chat/completions \\
   -H "Authorization: Bearer $TEENYTINY_API_KEY" \\
   -d '{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}'`,
 
-            'node-openai': `import OpenAI from 'openai';
+        "node-openai": `import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.TEENYTINY_API_KEY,
@@ -874,7 +1137,7 @@ const completion = await openai.chat.completions.create({
 
 console.log(completion.choices[0].message.content);`,
 
-            'node-vercel-ai-v4': `import { createOpenAI } from '@ai-sdk/openai';
+        "node-vercel-ai-v4": `import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
 const provider = createOpenAI({
@@ -889,7 +1152,7 @@ const { text } = await generateText({
 
 console.log(text);`,
 
-            'node-vercel-ai-v5': `import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+        "node-vercel-ai-v5": `import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 
 const provider = createOpenAICompatible({
@@ -905,7 +1168,7 @@ const { text } = await generateText({
 
 console.log(text);`,
 
-            'python-openai': `import os
+        "python-openai": `import os
 from openai import OpenAI
 
 client = OpenAI(
@@ -920,7 +1183,7 @@ response = client.chat.completions.create(
 
 print(response.choices[0].message.content)`,
 
-            'python-langchain': `import os
+        "python-langchain": `import os
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
@@ -932,7 +1195,7 @@ llm = ChatOpenAI(
 response = llm.invoke("Hello")
 print(response.content)`,
 
-            'python-litellm': `import os
+        "python-litellm": `import os
 import litellm
 
 response = litellm.completion(
@@ -943,7 +1206,7 @@ response = litellm.completion(
 )
 print(response.choices[0].message.content)`,
 
-            'java-openai': `import com.openai.client.OpenAIClient;
+        "java-openai": `import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.*;
 
@@ -965,7 +1228,7 @@ ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
 ChatCompletion completion = client.chat().completions().create(params);
 System.out.println(completion.choices().get(0).message().content().get());`,
 
-            'java-spring-ai': `import org.springframework.ai.chat.model.ChatResponse;
+        "java-spring-ai": `import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -984,7 +1247,7 @@ OpenAiChatModel chatModel = new OpenAiChatModel(openAiApi, options);
 ChatResponse response = chatModel.call(new Prompt("Hello"));
 System.out.println(response.getResult().getOutput().getContent());`,
 
-            'java-langchain4j': `import dev.langchain4j.model.chat.ChatLanguageModel;
+        "java-langchain4j": `import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 
 ChatLanguageModel model = OpenAiChatModel.builder()
@@ -997,7 +1260,7 @@ ChatLanguageModel model = OpenAiChatModel.builder()
 String response = model.generate("Hello");
 System.out.println(response);`,
 
-            'go-openai': `package main
+        "go-openai": `package main
 
 import (
 	"context"
@@ -1029,7 +1292,7 @@ func main() {
 	fmt.Println(resp.Choices[0].Message.Content)
 }`,
 
-            'ruby-openai': `require 'openai'
+        "ruby-openai": `require 'openai'
 
 client = OpenAI::Client.new(
   access_token: ENV['TEENYTINY_API_KEY'],
@@ -1045,7 +1308,7 @@ response = client.chat(
 
 puts response.dig('choices', 0, 'message', 'content')`,
 
-            'rust-openai': `use async_openai::{
+        "rust-openai": `use async_openai::{
     config::OpenAIConfig,
     types::{ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequestArgs},
     Client,
@@ -1075,15 +1338,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("{}", content);
     }
     Ok(())
-}`
-        };
+}`,
+      };
 
-        function updateCodeExample() {
-            const select = document.getElementById('languageSelect');
-            const codeExample = document.getElementById('codeExample');
-            codeExample.textContent = codeExamples[select.value];
-        }
+      function updateCodeExample() {
+        const select = document.getElementById("languageSelect");
+        const codeExample = document.getElementById("codeExample");
+        codeExample.textContent = codeExamples[select.value];
+      }
     </script>
-
-</body>
+  </body>
 </html>
