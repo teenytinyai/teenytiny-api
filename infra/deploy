@@ -132,8 +132,8 @@ echo -e "${GREEN}✅ Build completed${NC}"
 cd "$INFRA_DIR/terraform"
 echo -e "${BLUE}🔧 Initializing Terraform with R2 backend for $ENVIRONMENT...${NC}"
 
-# Initialize with environment-specific state key
-terraform init \
+# Use terraform wrapper for all operations
+./tf init \
     -backend-config="key=env/$ENVIRONMENT/terraform.tfstate" \
     -reconfigure
 
@@ -142,7 +142,7 @@ terraform init \
 
 # Step 3: Plan Terraform changes
 echo -e "${BLUE}📋 Planning infrastructure changes...${NC}"
-terraform plan \
+./tf plan \
     -var="environment=$ENVIRONMENT" \
     -var="domain=$DOMAIN" \
     -var="worker_name=$WORKER_NAME" \
@@ -152,7 +152,7 @@ terraform plan \
 
 # Step 4: Apply Terraform changes (DNS + routes)
 echo -e "${BLUE}🚀 Applying infrastructure changes...${NC}"
-terraform apply "$ENVIRONMENT.tfplan"
+./tf apply "$ENVIRONMENT.tfplan"
 
 # Clean up plan file
 rm -f "$ENVIRONMENT.tfplan"
@@ -164,43 +164,58 @@ cd "$PROJECT_ROOT/service"
 # Deploy with configuration from environments.yaml (no wrangler env blocks needed)
 npx wrangler deploy \
     --name "$WORKER_NAME" \
-    --route "$DOMAIN/*" \
+    --route "$DOMAIN/v1/*" \
+    --route "$DOMAIN/health" \
     --compatibility-date "2024-11-01" \
     --env=""
 
+# Step 5.1: Deploy Pages project
+echo -e "${BLUE}🌐 Deploying Pages website...${NC}"
+cd "$INFRA_DIR/terraform"
+PAGES_PROJECT_NAME=$(./tf output -raw pages_project_name 2>/dev/null | tail -1)
+
+cd "$PROJECT_ROOT"
+npx wrangler pages deploy website/ \
+    --project-name "$PAGES_PROJECT_NAME"
+
 # Step 6: Get deployment outputs
 cd "$INFRA_DIR/terraform"
-WORKER_URL=$(terraform output -raw worker_url)
-HEALTH_URL=$(terraform output -raw health_check_url)
+WORKER_URL=$(./tf output -raw worker_url 2>/dev/null | tail -1)
+HEALTH_URL=$(./tf output -raw health_check_url 2>/dev/null | tail -1) 
+PAGES_URL=$(./tf output -raw pages_url 2>/dev/null | tail -1)
+PAGES_PROJECT_NAME=$(./tf output -raw pages_project_name 2>/dev/null | tail -1)
 
 echo ""
 echo -e "${GREEN}🎉 Deployment completed successfully!${NC}"
 echo ""
 echo -e "${CYAN}📍 Deployment Details:${NC}"
 echo -e "  Environment: ${YELLOW}$ENVIRONMENT${NC}"
-echo -e "  Worker URL:  ${GREEN}$WORKER_URL${NC}"
-echo -e "  Health URL:  ${GREEN}$HEALTH_URL${NC}"
+echo -e "  Website:     ${GREEN}$PAGES_URL${NC}"
+echo -e "  API Health:  ${GREEN}$HEALTH_URL${NC}"
+echo -e "  Pages Project: ${GREEN}$PAGES_PROJECT_NAME${NC}"
 echo ""
 
-# Step 7: Wait a moment for DNS propagation and test
-echo -e "${BLUE}🧪 Testing deployment...${NC}"
+# Step 7: Wait a moment for DNS propagation and run comprehensive health check
+echo -e "${BLUE}🧪 Running comprehensive health check...${NC}"
 sleep 5
 
-if curl -f -s "$HEALTH_URL" > /dev/null; then
-    echo -e "${GREEN}✅ Health check passed!${NC}"
-    
-    # Test the actual response
-    RESPONSE=$(curl -s "$HEALTH_URL")
-    echo "Response: $RESPONSE"
+# Run the check script for complete validation
+if "$INFRA_DIR/check" "$ENVIRONMENT"; then
+    echo ""
+    echo -e "${CYAN}🎯 Next Steps:${NC}"
+    echo "• Visit website: $PAGES_URL"
+    echo "• Test API: curl $HEALTH_URL" 
+    echo "• Run health check: $(basename "$0" .sh) check $ENVIRONMENT"
+    echo "• View logs: wrangler tail --env $ENVIRONMENT"
+    echo ""
+    echo -e "${GREEN}🚀 $ENVIRONMENT environment is ready and healthy!${NC}"
 else
-    echo -e "${YELLOW}⚠️  Health check failed - this might be due to DNS propagation delay${NC}"
-    echo "Try again in a few minutes: curl $HEALTH_URL"
+    echo ""
+    echo -e "${YELLOW}⚠️  Some health checks failed - this might be due to DNS propagation delay${NC}"
+    echo -e "${CYAN}🔧 Troubleshooting:${NC}"
+    echo "• Wait a few minutes for DNS propagation"
+    echo "• Run: $(basename "$0" .sh) check $ENVIRONMENT"
+    echo "• Check logs: wrangler tail --env $ENVIRONMENT"
+    echo ""
+    echo -e "${YELLOW}🚀 $ENVIRONMENT deployment completed with warnings.${NC}"
 fi
-
-echo ""
-echo -e "${CYAN}🎯 Next Steps:${NC}"
-echo "• Test your API: curl $HEALTH_URL"
-echo "• Check health: $(basename "$0" .sh) check $ENVIRONMENT"
-echo "• View logs: wrangler tail --env $ENVIRONMENT"
-echo ""
-echo -e "${GREEN}🚀 $ENVIRONMENT environment is ready!${NC}"

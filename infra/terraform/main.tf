@@ -3,17 +3,51 @@ data "cloudflare_zone" "main" {
   name = var.zone_name
 }
 
-# Create DNS A record for the domain
-resource "cloudflare_record" "main" {
-  zone_id         = data.cloudflare_zone.main.id
-  name            = var.domain == var.zone_name ? "@" : replace(var.domain, ".${var.zone_name}", "")
-  content         = "192.0.2.1"  # Placeholder IP - Workers will override this
-  type            = "A"
-  proxied         = true  # CRITICAL: Must be proxied for Workers to work
-  ttl             = 1     # TTL of 1 means "automatic" when proxied
-  allow_overwrite = true  # Allow overwriting existing records
+# DNS will be managed automatically by Pages custom domain
+
+# Cloudflare Pages project for static website
+resource "cloudflare_pages_project" "website" {
+  account_id        = var.cloudflare_account_id
+  name             = "${var.worker_name}-website"
+  production_branch = "main"
+
+  # Build configuration
+  build_config {
+    build_command   = "echo 'Static files ready'"
+    destination_dir = "website"
+    root_dir        = ""
+  }
+
+  # Deployment configuration 
+  deployment_configs {
+    preview {
+      compatibility_date = "2024-11-01"
+    }
+    production {
+      compatibility_date = "2024-11-01"
+    }
+  }
+}
+
+# CNAME record for Pages domain verification
+resource "cloudflare_record" "pages_verification" {
+  zone_id = data.cloudflare_zone.main.id
+  name    = var.domain == var.zone_name ? "qa" : replace(var.domain, ".${var.zone_name}", "")
+  content = "${cloudflare_pages_project.website.name}.pages.dev"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1
   
-  comment = "Managed by Terraform - TeenyTiny AI ${var.environment}"
+  comment = "Pages domain verification - ${var.environment}"
+}
+
+# Custom domain for Pages - Pages manages DNS, Worker handles specific routes
+resource "cloudflare_pages_domain" "website" {
+  account_id   = var.cloudflare_account_id
+  project_name = cloudflare_pages_project.website.name
+  domain       = var.domain
+
+  depends_on = [cloudflare_pages_project.website, cloudflare_record.pages_verification]
 }
 
 # Worker routes are automatically managed by Wrangler via wrangler.toml

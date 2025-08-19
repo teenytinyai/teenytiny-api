@@ -57,8 +57,6 @@ if [ "$DOMAIN" = "null" ]; then
 fi
 
 BASE_URL="https://$DOMAIN"
-HEALTH_URL="$BASE_URL/health"
-MODELS_URL="$BASE_URL/v1/models"
 
 echo -e "${BLUE}📋 Environment: $ENVIRONMENT${NC}"
 echo "  Domain: $DOMAIN"
@@ -66,93 +64,153 @@ echo "  Worker: $WORKER_NAME"
 echo "  Base URL: $BASE_URL"
 echo ""
 
-# Function to test endpoint
-test_endpoint() {
-    local name="$1"
-    local url="$2"
-    local expected_pattern="$3"
-    local auth_header="$4"
-    
-    echo -n -e "${BLUE}Testing $name...${NC} "
-    
-    local curl_cmd="curl -s -m 10"
-    if [ -n "$auth_header" ]; then
-        curl_cmd="$curl_cmd -H \"$auth_header\""
-    fi
-    
-    if response=$(eval "$curl_cmd \"$url\"" 2>/dev/null); then
-        if [ -n "$expected_pattern" ] && echo "$response" | grep -q "$expected_pattern"; then
-            echo -e "${GREEN}✅ Working${NC}"
-            echo "    Response: $response"
-            return 0
-        elif [ -z "$expected_pattern" ]; then
-            echo -e "${GREEN}✅ Reachable${NC}"
-            echo "    Response: $response"
-            return 0
-        else
-            echo -e "${YELLOW}⚠️ Unexpected response${NC}"
-            echo "    Response: $response"
-            return 1
-        fi
-    else
-        echo -e "${RED}❌ Failed${NC}"
-        return 1
-    fi
-}
-
-# Test DNS resolution
-echo -e "${BLUE}🔍 DNS Resolution${NC}"
-if nslookup "$DOMAIN" > /dev/null 2>&1; then
-    echo -e "${GREEN}✅ DNS resolving for $DOMAIN${NC}"
-else
-    echo -e "${RED}❌ DNS not resolving for $DOMAIN${NC}"
-fi
-
-echo ""
-
-# Test basic endpoints
-echo -e "${BLUE}🧪 Basic Health Checks${NC}"
-test_endpoint "Health endpoint" "$HEALTH_URL" "teenytiny-api"
-test_endpoint "Models endpoint (unauthenticated)" "$MODELS_URL" ""
-
-echo ""
-
-# Test authenticated endpoints if API key is available
-echo -e "${BLUE}🔐 Authenticated Endpoints${NC}"
-
-# Load .env file for API key (optional for health checks)
+# Load .env file for API key
 if [ -f "$INFRA_DIR/.env" ]; then
     source "$INFRA_DIR/.env"
 fi
 
-if [ -n "$API_KEY" ] && [ "$API_KEY" != "" ]; then
-    echo "Using API key for $ENVIRONMENT environment"
-    test_endpoint "Models endpoint (authenticated)" "$MODELS_URL" "echo" "Authorization: Bearer $API_KEY"
-    test_endpoint "Chat completions endpoint" "$BASE_URL/v1/chat/completions" "" "Authorization: Bearer $API_KEY"
+# Generate test API key if not found
+if [ -z "$API_KEY" ] || [ "$API_KEY" = "" ]; then
+    # Generate a test key for validation
+    TEST_API_KEY="tt-test-key-$(date +%s)"
+    echo -e "${YELLOW}ℹ️  No API_KEY in .env, using test key: $TEST_API_KEY${NC}"
 else
-    echo -e "${YELLOW}⚠️ No API key found for $ENVIRONMENT environment${NC}"
-    echo "Add API_KEY=your-key to infra/.env file for authenticated endpoint testing"
+    TEST_API_KEY="$API_KEY"
 fi
 
+# Test counters
+TESTS_PASSED=0
+TESTS_TOTAL=0
+
+# Function to test HTTP endpoint
+test_http() {
+    local description="$1"
+    local url="$2"
+    local expected_status="$3"
+    local expected_content_type="$4"
+    local expected_content_pattern="$5"
+    local auth_header="$6"
+    
+    TESTS_TOTAL=$((TESTS_TOTAL + 1))
+    echo -e "${BLUE}Testing: $description${NC}"
+    
+    local curl_cmd="curl -s -w \"HTTP_STATUS:%{http_code}\" -m 10"
+    local display_cmd="curl"
+    if [ -n "$auth_header" ]; then
+        curl_cmd="$curl_cmd -H \"$auth_header\""
+        display_cmd="$display_cmd -H \"$auth_header\""
+    fi
+    display_cmd="$display_cmd \"$url\""
+    
+    echo -e "${CYAN}  Command: $display_cmd${NC}"
+    echo -n -e "  Result: "
+    
+    if response=$(eval "$curl_cmd \"$url\"" 2>/dev/null); then
+        # Extract status code and body
+        local http_status=$(echo "$response" | grep -o "HTTP_STATUS:[0-9]*" | cut -d: -f2)
+        local body=$(echo "$response" | sed 's/HTTP_STATUS:[0-9]*$//')
+        
+        local passed=true
+        local error_msg=""
+        
+        # Check status code
+        if [ "$http_status" != "$expected_status" ]; then
+            passed=false
+            error_msg="Expected status $expected_status, got $http_status"
+        fi
+        
+        # Check content type if specified
+        if [ -n "$expected_content_type" ] && $passed; then
+            local content_type_header=$(eval "$curl_cmd -I \"$url\"" 2>/dev/null | grep -i "content-type:" | head -1)
+            if ! echo "$content_type_header" | grep -q "$expected_content_type"; then
+                passed=false
+                error_msg="Expected content-type containing '$expected_content_type'"
+            fi
+        fi
+        
+        # Check content pattern if specified
+        if [ -n "$expected_content_pattern" ] && $passed; then
+            if ! echo "$body" | grep -q "$expected_content_pattern"; then
+                passed=false
+                error_msg="Expected content containing '$expected_content_pattern'"
+            fi
+        fi
+        
+        if $passed; then
+            echo -e "${GREEN}✅ PASS${NC}"
+            TESTS_PASSED=$((TESTS_PASSED + 1))
+            # Show first 100 chars of response for confirmation
+            local preview=$(echo "$body" | head -c 100)
+            if [ ${#body} -gt 100 ]; then
+                preview="$preview..."
+            fi
+            echo "  Status: $http_status, Response: $preview"
+        else
+            echo -e "${RED}❌ FAIL${NC}"
+            echo "  $error_msg"
+            echo "  Status: $http_status, Response: $body"
+        fi
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo "  Connection failed"
+    fi
+    echo ""
+}
+
+# Run all tests
+echo -e "${BLUE}🧪 Running Health Checks${NC}"
 echo ""
 
-# Summary
-echo -e "${CYAN}📊 Health Check Summary${NC}"
+# Test 1: Homepage returns 200 and HTML
+test_http "Homepage (/) returns 200 and HTML" \
+    "$BASE_URL/" \
+    "200" \
+    "text/html" \
+    "TeenyTiny AI"
+
+# Test 2: 404 page returns 404
+test_http "Not found (/notfound) returns 404" \
+    "$BASE_URL/notfound" \
+    "404" \
+    "" \
+    ""
+
+# Test 3: Health endpoint returns 200 and JSON
+test_http "Health endpoint (/health) returns 200 and JSON" \
+    "$BASE_URL/health" \
+    "200" \
+    "application/json" \
+    "teenytiny-api"
+
+# Test 4: Models without auth returns 401 and JSON
+test_http "Models endpoint (/v1/models) without auth returns 401" \
+    "$BASE_URL/v1/models" \
+    "401" \
+    "application/json" \
+    "error"
+
+# Test 5: Models with auth returns 200 and JSON
+test_http "Models endpoint (/v1/models) with auth returns 200 and JSON" \
+    "$BASE_URL/v1/models" \
+    "200" \
+    "application/json" \
+    "echo" \
+    "Authorization: Bearer $TEST_API_KEY"
+
+echo ""
+echo -e "${CYAN}📊 Health Check Results${NC}"
+echo "================================"
+echo -e "Tests passed: ${GREEN}$TESTS_PASSED${NC}/$TESTS_TOTAL"
 echo "Environment: $ENVIRONMENT"
 echo "Domain: $DOMAIN"
 echo "Base URL: $BASE_URL"
 
-# Check Terraform state if available
-cd "$INFRA_DIR/terraform" 2>/dev/null || true
-if [ -f "terraform.tfstate" ]; then
+if [ $TESTS_PASSED -eq $TESTS_TOTAL ]; then
     echo ""
-    echo -e "${BLUE}🏗️ Infrastructure Status${NC}"
-    if terraform show -json terraform.tfstate | jq -e ".values.root_module.resources[] | select(.address == \"cloudflare_worker_script.main\")" > /dev/null 2>&1; then
-        echo -e "${GREEN}✅ Worker deployed via Terraform${NC}"
-    else
-        echo -e "${YELLOW}⚠️ Worker not found in Terraform state${NC}"
-    fi
+    echo -e "${GREEN}🎉 All tests passed! Environment is healthy.${NC}"
+    exit 0
+else
+    echo ""
+    echo -e "${RED}⚠️  Some tests failed. Check the environment.${NC}"
+    exit 1
 fi
-
-echo ""
-echo -e "${GREEN}🎯 Health check completed!${NC}"

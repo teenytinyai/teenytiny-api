@@ -21,7 +21,10 @@ NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-echo -e "${BLUE}🔧 TeenyTiny AI Terraform Wrapper${NC}"
+# Only show headers for non-output commands
+if [[ "$1" != "output" ]]; then
+    echo -e "${BLUE}🔧 TeenyTiny AI Terraform Wrapper${NC}"
+fi
 
 # Load .env file
 if [ ! -f "$INFRA_DIR/.env" ]; then
@@ -31,7 +34,9 @@ if [ ! -f "$INFRA_DIR/.env" ]; then
     exit 1
 fi
 
-echo -e "${BLUE}📋 Loading environment from .env...${NC}"
+if [[ "$1" != "output" ]]; then
+    echo -e "${BLUE}📋 Loading environment from .env...${NC}"
+fi
 source "$INFRA_DIR/.env"
 
 # Export environment variables for Terraform
@@ -66,9 +71,9 @@ if ! command -v terraform &> /dev/null; then
     exit 1
 fi
 
-echo -e "${GREEN}✅ Environment loaded successfully${NC}"
-echo ""
-
-# Run terraform command with all arguments passed through
-echo -e "${BLUE}🚀 Running: terraform $*${NC}"
+if [[ "$1" != "output" ]]; then
+    echo -e "${GREEN}✅ Environment loaded successfully${NC}"
+    echo ""
+    echo -e "${BLUE}🚀 Running: terraform $*${NC}"
+fi
 terraform "$@"
