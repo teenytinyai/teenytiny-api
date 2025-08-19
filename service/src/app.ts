@@ -15,8 +15,6 @@ import { EchoModel } from './models/echo-model.js';
 import { ElizaModel } from './models/eliza-model.js';
 import { ParryModel } from './models/parry-model.js';
 import { RacterModel } from './models/racter-model.js';
-import { DelayModelware } from './modelware/delay-modelware.js';
-import { StreamSplitModelware } from './modelware/stream-split-modelware.js';
 import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
 import { corsMiddleware } from './middleware/cors.js';
 import { createLoggingMiddleware } from './middleware/logging.js';
@@ -33,27 +31,11 @@ export function createApp(config: AppConfig) {
   const coreRegistry = new ModelRegistry();
   const openaiRegistry = new OpenAIModelRegistry(coreRegistry);
   
-  // Create models with composition
-  const echoModel = new EchoModel();
-  const streamSplitEcho = new StreamSplitModelware(echoModel, StreamSplitModelware.WORDS);
-  const delayedEchoModel = new DelayModelware(streamSplitEcho, 50);
-  
-  const elizaModel = new ElizaModel();
-  const streamSplitEliza = new StreamSplitModelware(elizaModel, StreamSplitModelware.WORDS);
-  const delayedElizaModel = new DelayModelware(streamSplitEliza, 100);
-  
-  const parryModel = new ParryModel();
-  const streamSplitParry = new StreamSplitModelware(parryModel, StreamSplitModelware.WORDS);
-  const delayedParryModel = new DelayModelware(streamSplitParry, 120);
-  
-  const racterModel = new RacterModel();
-  const streamSplitRacter = new StreamSplitModelware(racterModel, StreamSplitModelware.WORDS);
-  const delayedRacterModel = new DelayModelware(streamSplitRacter, 80);
-  
-  openaiRegistry.register('echo', delayedEchoModel);
-  openaiRegistry.register('eliza', delayedElizaModel);
-  openaiRegistry.register('parry', delayedParryModel);
-  openaiRegistry.register('racter', delayedRacterModel);
+  // Register models directly without any modelware decorations for fast responses
+  openaiRegistry.register('echo', new EchoModel());
+  openaiRegistry.register('eliza', new ElizaModel());
+  openaiRegistry.register('parry', new ParryModel());
+  openaiRegistry.register('racter', new RacterModel());
 
   // Middleware
   app.use('*', corsMiddleware());
