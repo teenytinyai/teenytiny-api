@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      .bg { fill: #0a0a0a; }
+      .text { fill: #00ff41; font-family: monospace; font-size: 14px; font-weight: bold; }
+    </style>
+  </defs>
+  
+  <!-- Transparent background to establish bounds -->
+  <rect width="32" height="32" fill="transparent"/>
+  
+  <!-- Black monitor background with rounded corners -->
+  <rect class="bg" x="2" y="2" width="28" height="28" rx="4" ry="4"/>
+  
+  <!-- TT Text -->
+  <text class="text" x="5" y="21">TT</text>
+  
+  <!-- Static Underscore Cursor -->
+  <text class="text" x="20" y="21">_</text>
+</svg>
