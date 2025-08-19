@@ -24,6 +24,12 @@ export interface AppConfig {
   auth: AuthConfig;
 }
 
+// Helper function to create pretty-printed JSON responses
+function prettyJson(c: any, data: any) {
+  c.header('Content-Type', 'application/json');
+  return c.body(JSON.stringify(data, null, 2));
+}
+
 export function createApp(config: AppConfig) {
   const app = new Hono<{ Variables: Variables }>();
 
@@ -47,7 +53,7 @@ export function createApp(config: AppConfig) {
 
   // Health check endpoint
   app.get('/health', (c) => {
-    return c.json({
+    return prettyJson(c, {
       status: 'ok',
       service: 'teenytiny-api',
       timestamp: new Date().toISOString(),
@@ -65,7 +71,7 @@ export function createApp(config: AppConfig) {
       model_count: response.data.length,
     }));
 
-    return c.json(response);
+    return prettyJson(c, response);
   });
 
   // Chat completions endpoint
@@ -188,7 +194,7 @@ export function createApp(config: AppConfig) {
         completion_tokens: response.usage.completion_tokens,
       }));
 
-      return c.json(response);
+      return prettyJson(c, response);
     }
   });
 
