@@ -31,12 +31,13 @@ resource "cloudflare_pages_project" "website" {
 
 # CNAME record for Pages domain verification
 resource "cloudflare_record" "pages_verification" {
-  zone_id = data.cloudflare_zone.main.id
-  name    = var.domain == var.zone_name ? "qa" : replace(var.domain, ".${var.zone_name}", "")
-  content = "${cloudflare_pages_project.website.name}.pages.dev"
-  type    = "CNAME"
-  proxied = true
-  ttl     = 1
+  zone_id         = data.cloudflare_zone.main.id
+  name            = var.domain == var.zone_name ? "@" : replace(var.domain, ".${var.zone_name}", "")
+  content         = "${cloudflare_pages_project.website.name}.pages.dev"
+  type            = "CNAME"
+  proxied         = true
+  ttl             = 1
+  allow_overwrite = true
   
   comment = "Pages domain verification - ${var.environment}"
 }

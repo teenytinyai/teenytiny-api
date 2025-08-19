@@ -69,13 +69,14 @@ if [ -f "$INFRA_DIR/.env" ]; then
     source "$INFRA_DIR/.env"
 fi
 
-# Generate test API key if not found
-if [ -z "$API_KEY" ] || [ "$API_KEY" = "" ]; then
-    # Generate a test key for validation
-    TEST_API_KEY="tt-test-key-$(date +%s)"
-    echo -e "${YELLOW}ℹ️  No API_KEY in .env, using test key: $TEST_API_KEY${NC}"
-else
+# Use consistent API key across environments (both workers use same fallback)
+if [ -n "$API_KEY" ] && [ "$API_KEY" != "" ] && [ "$API_KEY" != "teenykey" ]; then
     TEST_API_KEY="$API_KEY"
+    echo -e "${BLUE}ℹ️  Using API_KEY from .env: ${API_KEY:0:6}***${NC}"
+else
+    # Both prod and qa workers use the same default API key
+    TEST_API_KEY="tt-1234567890abcdef"
+    echo -e "${BLUE}ℹ️  Using default worker API key${NC}"
 fi
 
 # Test counters
