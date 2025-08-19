@@ -1,4 +1,3 @@
-import type { AuthConfig } from './auth-config.js';
 import type { Authenticator } from './authenticator.js';
 
 /**
@@ -8,17 +7,17 @@ import type { Authenticator } from './authenticator.js';
  * Suitable for development and simple demo environments.
  */
 export class SingleKeyAuthenticator implements Authenticator {
-  private config: AuthConfig;
+  private apiKey: string;
 
-  constructor(config: AuthConfig) {
-    this.config = config;
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
   }
 
   async generateApiKey(): Promise<string> {
-    return this.config.apiKey;
+    return this.apiKey;
   }
 
   async validateApiKey(key: string): Promise<boolean> {
-    return key === this.config.apiKey;
+    return key === this.apiKey;
   }
 }
