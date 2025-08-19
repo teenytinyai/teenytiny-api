@@ -1,11 +1,8 @@
 import { Context, Next } from 'hono';
 import { AuthenticationError } from '../openai-protocol/errors.js';
+import type { Authenticator } from '../auth/authenticator.js';
 
-export interface AuthConfig {
-  apiKey: string;
-}
-
-export function createAuthMiddleware(config: AuthConfig) {
+export function createAuthMiddleware(authenticator: Authenticator) {
   return async (c: Context, next: Next) => {
     // Skip auth for health check
     if (c.req.path === '/health') {
@@ -24,7 +21,8 @@ export function createAuthMiddleware(config: AuthConfig) {
     }
 
     const token = authHeader.slice(bearerPrefix.length);
-    if (token !== config.apiKey) {
+    const isValid = await authenticator.validateApiKey(token);
+    if (!isValid) {
       throw new AuthenticationError('Invalid API key');
     }
 

@@ -15,10 +15,13 @@ import { EchoModel } from './models/echo-model.js';
 import { ElizaModel } from './models/eliza-model.js';
 import { ParryModel } from './models/parry-model.js';
 import { RacterModel } from './models/racter-model.js';
-import { createAuthMiddleware, type AuthConfig } from './middleware/auth.js';
+import { createAuthMiddleware } from './middleware/auth.js';
 import { corsMiddleware } from './middleware/cors.js';
 import { createLoggingMiddleware } from './middleware/logging.js';
 import { createErrorHandler } from './middleware/errors.js';
+import { SingleKeyAuthenticator } from './auth/single-key-authenticator.js';
+import type { Authenticator } from './auth/authenticator.js';
+import type { AuthConfig } from './auth/auth-config.js';
 
 export interface AppConfig {
   auth: AuthConfig;
@@ -32,6 +35,9 @@ function prettyJson(c: any, data: any) {
 
 export function createApp(config: AppConfig) {
   const app = new Hono<{ Variables: Variables }>();
+
+  // Initialize authenticator
+  const authenticator: Authenticator = new SingleKeyAuthenticator(config.auth);
 
   // Initialize model registries
   const coreRegistry = new ModelRegistry();
@@ -48,7 +54,7 @@ export function createApp(config: AppConfig) {
   app.use('*', createLoggingMiddleware());
 
   // Auth middleware (only for API routes)
-  app.use('/v1/*', createAuthMiddleware(config.auth));
+  app.use('/v1/*', createAuthMiddleware(authenticator));
 
   // Error handler
   app.onError(createErrorHandler());
@@ -201,11 +207,10 @@ export function createApp(config: AppConfig) {
   });
 
   // Website-specific endpoints (no auth required)
-  app.post('/site/new-key', (c) => {
-    // TODO: Generate actual random API keys and store them for proper key management
-    // For now, return the configured API key for demo purposes
+  app.post('/site/new-key', async (c) => {
+    const apiKey = await authenticator.generateApiKey();
     return prettyJson(c, {
-      key: config.auth.apiKey
+      key: apiKey
     });
   });
 
