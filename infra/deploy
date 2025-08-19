@@ -167,6 +167,7 @@ npx wrangler deploy \
     --name "$WORKER_NAME" \
     --route "$DOMAIN/v1/*" \
     --route "$DOMAIN/health" \
+    --route "$DOMAIN/site/*" \
     --compatibility-date "2024-11-01" \
     --env=""
 

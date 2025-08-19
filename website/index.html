@@ -709,50 +709,46 @@
     </footer>
 
     <script>
-        // Simple chat responses by model
-        const responses = {
-            eliza: [
-                "Tell me more about that.",
-                "How does that make you feel?",
-                "What do you think?",
-                "Can you elaborate?",
-                "Why do you say that?",
-                "Interesting perspective."
-            ],
-            parry: [
-                "That's suspicious.",
-                "I don't trust what you're saying.",
-                "Are you trying to trick me?",
-                "Everyone's against me.",
-                "That sounds like a lie.",
-                "You're probably working for them."
-            ],
-            racter: [
-                "Purple elephants dance in my coffee.",
-                "The moon whispers secrets to doorknobs.",
-                "Seventeen umbrellas sailed through Tuesday.",
-                "My thoughts are made of crystallized laughter.",
-                "Time flows backwards through rainbow puddles.",
-                "Silent screams echo in velvet darkness."
-            ]
-        };
-
+        // Model-specific prompts for chat input
         const prompts = {
             eliza: "Hello, I feel a bit uncertain today...",
-            parry: "I think someone might be watching me...",
+            parry: "How you feeling today?",
             racter: "Tell me a story about colors..."
         };
 
         let currentModel = 'eliza';
         let firstMessage = true;
+        let cachedApiKey = null;
+        let conversationHistory = [];
+
+        // Get API key with caching
+        async function getApiKey() {
+            if (cachedApiKey) {
+                return cachedApiKey;
+            }
+            
+            try {
+                const response = await fetch('/site/new-key', { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                cachedApiKey = data.key;
+                return cachedApiKey;
+            } catch (error) {
+                console.error('Failed to get API key:', error);
+                throw error;
+            }
+        }
 
         function changeModel() {
             const select = document.getElementById('modelSelect');
             currentModel = select.value;
 
-            // Clear chat
+            // Clear chat and conversation history
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML = '';
+            conversationHistory = [];
 
             // Update input prompt
             const input = document.getElementById('chatInput');
@@ -761,38 +757,71 @@
             firstMessage = true;
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('chatInput');
             if (input.value.trim()) {
                 const chatMessages = document.getElementById('chatMessages');
                 const userMessage = input.value.trim();
 
-                // Add user message
+                // Add user message to chat and conversation history
                 const userLine = document.createElement('div');
                 userLine.className = 'chat-line user';
                 userLine.textContent = `> ${userMessage}`;
                 chatMessages.appendChild(userLine);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                // Get appropriate response
-                const modelResponses = responses[currentModel];
-                const response = modelResponses[Math.floor(Math.random() * modelResponses.length)];
+                conversationHistory.push({ role: 'user', content: userMessage });
 
-                // Add bot response
-                setTimeout(() => {
-                    const botLine = document.createElement('div');
-                    botLine.className = 'chat-line bot';
-                    botLine.textContent = `${currentModel.toUpperCase()}: ${response}`;
-                    chatMessages.appendChild(botLine);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 300);
-
-                // Clear input after first message or clear manually typed text
+                // Clear input
                 if (firstMessage) {
                     input.value = '';
                     firstMessage = false;
                 } else {
                     input.value = '';
                 }
+
+                // Show loading indicator
+                const loadingLine = document.createElement('div');
+                loadingLine.className = 'chat-line bot';
+                loadingLine.textContent = `${currentModel.toUpperCase()}: ...`;
+                chatMessages.appendChild(loadingLine);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    // Get API key and make request
+                    const apiKey = await getApiKey();
+                    
+                    const response = await fetch('/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: currentModel,
+                            messages: conversationHistory
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const botResponse = data.choices[0].message.content;
+
+                    // Replace loading indicator with actual response
+                    loadingLine.textContent = `${currentModel.toUpperCase()}: ${botResponse}`;
+                    
+                    // Add bot response to conversation history
+                    conversationHistory.push({ role: 'assistant', content: botResponse });
+
+                } catch (error) {
+                    // Replace loading indicator with error message
+                    loadingLine.textContent = `${currentModel.toUpperCase()}: [Error: Could not get response. Please try again.]`;
+                    console.error('Chat API error:', error);
+                }
+
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
@@ -804,13 +833,22 @@
         });
 
         // API Key generation
-        function generateApiKey() {
-            const apiKey = 'tt-1234567890abcdef';
-
+        async function generateApiKey() {
             const content = document.getElementById('apiContent');
-            content.style.justifyContent = 'flex-start';
-            content.style.textAlign = 'left';
-            content.innerHTML = `TEENYTINY_API_KEY=${apiKey}`;
+            
+            try {
+                // Show loading state
+                content.innerHTML = 'Generating...';
+                
+                const apiKey = await getApiKey();
+                
+                content.style.justifyContent = 'flex-start';
+                content.style.textAlign = 'left';
+                content.innerHTML = `TEENYTINY_API_KEY=${apiKey}`;
+            } catch (error) {
+                content.innerHTML = 'Error generating API key. Please try again.';
+                console.error('API key generation failed:', error);
+            }
         }
 
         // Code examples

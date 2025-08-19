@@ -1,4 +1,4 @@
 {
   "version": 1,
-  "exclude": ["/v1/*", "/health"]
+  "exclude": ["/v1/*", "/health", "/site/*"]
 }

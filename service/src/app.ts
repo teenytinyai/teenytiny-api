@@ -200,6 +200,15 @@ export function createApp(config: AppConfig) {
     }
   });
 
+  // Website-specific endpoints (no auth required)
+  app.post('/site/new-key', (c) => {
+    // TODO: Generate actual random API keys and store them for proper key management
+    // For now, return the configured API key for demo purposes
+    return prettyJson(c, {
+      key: config.auth.apiKey
+    });
+  });
+
   // 404 handler
   app.notFound((c) => {
     throw new NotFoundError(`Not found: ${c.req.method} ${c.req.path}`);

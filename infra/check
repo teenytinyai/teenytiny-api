@@ -91,12 +91,20 @@ test_http() {
     local expected_content_type="$4"
     local expected_content_pattern="$5"
     local auth_header="$6"
+    local method="${7:-GET}"  # Default to GET if not specified
     
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
     echo -e "${BLUE}Testing: $description${NC}"
     
     local curl_cmd="curl -s -w \"HTTP_STATUS:%{http_code}\" -m 10"
     local display_cmd="curl"
+    
+    # Add method if not GET
+    if [ "$method" != "GET" ]; then
+        curl_cmd="$curl_cmd -X $method"
+        display_cmd="$display_cmd -X $method"
+    fi
+    
     if [ -n "$auth_header" ]; then
         curl_cmd="$curl_cmd -H \"$auth_header\""
         display_cmd="$display_cmd -H \"$auth_header\""
@@ -205,6 +213,15 @@ test_http "Models endpoint (/v1/models) with auth returns 200 and JSON" \
     "application/json" \
     "echo" \
     "Authorization: Bearer $TEST_API_KEY"
+
+# Test 7: Site API key generation returns 200 and JSON
+test_http "Site API key endpoint (/site/new-key) returns 200 and JSON" \
+    "$BASE_URL/site/new-key" \
+    "200" \
+    "application/json" \
+    "key" \
+    "" \
+    "POST"
 
 echo ""
 echo -e "${CYAN}📊 Health Check Results${NC}"
