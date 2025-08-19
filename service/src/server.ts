@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
 import { serve } from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static';
 import { createApp } from './app.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DEFAULT_PORT = 8080;
 const DEFAULT_API_KEY = 'testkey';
@@ -99,6 +105,10 @@ async function main() {
       apiKey: config.apiKey,
     },
   });
+
+  // Add static file serving for development (Node.js only)
+  const websiteRoot = path.resolve(__dirname, '../../website');
+  app.use('/*', serveStatic({ root: websiteRoot }));
 
   console.log(JSON.stringify({
     level: 'info',

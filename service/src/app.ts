@@ -43,10 +43,12 @@ export function createApp(config: AppConfig) {
   openaiRegistry.register('parry', new ParryModel());
   openaiRegistry.register('racter', new RacterModel());
 
-  // Middleware
+  // Global middleware (applies to all routes)
   app.use('*', corsMiddleware());
   app.use('*', createLoggingMiddleware());
-  app.use('*', createAuthMiddleware(config.auth));
+
+  // Auth middleware (only for API routes)
+  app.use('/v1/*', createAuthMiddleware(config.auth));
 
   // Error handler
   app.onError(createErrorHandler());
