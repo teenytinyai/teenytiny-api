@@ -189,7 +189,15 @@ test_http "Models endpoint (/v1/models) without auth returns 401" \
     "application/json" \
     "error"
 
-# Test 5: Models with auth returns 200 and JSON
+# Test 5: Models with bad API key returns 401 and JSON
+test_http "Models endpoint (/v1/models) with bad API key returns 401" \
+    "$BASE_URL/v1/models" \
+    "401" \
+    "application/json" \
+    "error" \
+    "Authorization: Bearer bad-key-123"
+
+# Test 6: Models with auth returns 200 and JSON
 test_http "Models endpoint (/v1/models) with auth returns 200 and JSON" \
     "$BASE_URL/v1/models" \
     "200" \
