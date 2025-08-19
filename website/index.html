@@ -551,9 +551,8 @@
                                 <option value="ruby">Ruby</option>
                             </select>
                         </div>
-                        <div class="code-example" id="codeExample">curl -X POST https://api.teenytiny.ai/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
+                        <div class="code-example" id="codeExample">curl -X POST https://teenytiny.ai/v1/chat/completions \
+  -H "Authorization: Bearer $TEENYTINY_API_KEY" \
   -d '{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}'</div>
                     </div>
                 </div>
@@ -798,16 +797,14 @@
 
         // Code examples
         const codeExamples = {
-            curl: `curl -X POST https://api.teenytiny.ai/v1/chat/completions \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
+            curl: `curl -X POST https://teenytiny.ai/v1/chat/completions \\
+  -H "Authorization: Bearer $TEENYTINY_API_KEY" \\
   -d '{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}'`,
             
-            node: `const response = await fetch('https://api.teenytiny.ai/v1/chat/completions', {
+            node: `const response = await fetch('https://teenytiny.ai/v1/chat/completions', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer YOUR_API_KEY',
-    'Content-Type': 'application/json'
+    'Authorization': \`Bearer \${process.env.TEENYTINY_API_KEY}\`
   },
   body: JSON.stringify({
     model: 'eliza',
@@ -816,12 +813,12 @@
 });`,
             
             python: `import requests
+import os
 
 response = requests.post(
-    'https://api.teenytiny.ai/v1/chat/completions',
+    'https://teenytiny.ai/v1/chat/completions',
     headers={
-        'Authorization': 'Bearer YOUR_API_KEY',
-        'Content-Type': 'application/json'
+        'Authorization': f'Bearer {os.getenv("TEENYTINY_API_KEY")}'
     },
     json={
         'model': 'eliza',
@@ -829,17 +826,15 @@ response = requests.post(
     }
 )`,
             
-            go: `req, _ := http.NewRequest("POST", "https://api.teenytiny.ai/v1/chat/completions", 
+            go: `req, _ := http.NewRequest("POST", "https://teenytiny.ai/v1/chat/completions", 
     strings.NewReader(\`{"model": "eliza", "messages": [{"role": "user", "content": "Hello"}]}\`))
-req.Header.Set("Authorization", "Bearer YOUR_API_KEY")
-req.Header.Set("Content-Type", "application/json")
+req.Header.Set("Authorization", "Bearer " + os.Getenv("TEENYTINY_API_KEY"))
 resp, _ := http.DefaultClient.Do(req)`,
             
-            php: `$ch = curl_init('https://api.teenytiny.ai/v1/chat/completions');
+            php: `$ch = curl_init('https://teenytiny.ai/v1/chat/completions');
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer YOUR_API_KEY',
-    'Content-Type: application/json'
+    'Authorization: Bearer ' . $_ENV['TEENYTINY_API_KEY']
 ]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'model' => 'eliza',
@@ -847,8 +842,8 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
 ]));`,
             
             rust: `let client = reqwest::Client::new();
-let response = client.post("https://api.teenytiny.ai/v1/chat/completions")
-    .header("Authorization", "Bearer YOUR_API_KEY")
+let response = client.post("https://teenytiny.ai/v1/chat/completions")
+    .header("Authorization", format!("Bearer {}", env::var("TEENYTINY_API_KEY")?))
     .json(&json!({
         "model": "eliza",
         "messages": [{"role": "user", "content": "Hello"}]
@@ -856,23 +851,21 @@ let response = client.post("https://api.teenytiny.ai/v1/chat/completions")
     .send().await?;`,
             
             java: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.teenytiny.ai/v1/chat/completions"))
-    .header("Authorization", "Bearer YOUR_API_KEY")
-    .header("Content-Type", "application/json")
+    .uri(URI.create("https://teenytiny.ai/v1/chat/completions"))
+    .header("Authorization", "Bearer " + System.getenv("TEENYTINY_API_KEY"))
     .POST(HttpRequest.BodyPublishers.ofString(
-        "{\\"model\\": \\"eliza\\", \\"messages\\": [{\\"role\\": \\"user\\", \\"content\\": \\"Hello\\"}]}"
+        "{\"model\": \"eliza\", \"messages\": [{\"role\": \"user\", \"content\": \"Hello\"}]}"
     )).build();`,
             
             ruby: `require 'net/http'
 require 'json'
 
-uri = URI('https://api.teenytiny.ai/v1/chat/completions')
+uri = URI('https://teenytiny.ai/v1/chat/completions')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
 request = Net::HTTP::Post.new(uri)
-request['Authorization'] = 'Bearer YOUR_API_KEY'
-request['Content-Type'] = 'application/json'
+request['Authorization'] = "Bearer #{ENV['TEENYTINY_API_KEY']}"
 request.body = JSON.generate({
   model: 'eliza',
   messages: [{role: 'user', content: 'Hello'}]
